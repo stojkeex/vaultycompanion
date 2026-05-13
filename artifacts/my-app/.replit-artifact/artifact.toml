@@ -1,5 +1,5 @@
 kind = "web"
-previewPath = "/"
+previewPath = "/my-app/"
 title = "My App"
 version = "1.0.0"
 id = "artifacts/my-app"
@@ -11,7 +11,7 @@ version = "1.0.0"
 
 [[services]]
 name = "web"
-paths = [ "/" ]
+paths = [ "/my-app/" ]
 localPort = 19621
 
 [services.development]
@@ -28,4 +28,4 @@ to = "/index.html"
 
 [services.env]
 PORT = "19621"
-BASE_PATH = "/"
+BASE_PATH = "/my-app/"
