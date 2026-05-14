@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useLocation, Link } from "wouter";
 import { Loader2, Mail, Lock, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import vaultyWordmark from "@/assets/vaulty-wordmark.png";
 
 const sentences = [
   "Master your financial future with Vaulty.",
@@ -122,7 +123,7 @@ export default function Login() {
       <div className="w-full max-w-sm relative z-10 flex flex-col items-center space-y-12">
         {/* Logo and Typing Text */}
         <div className="text-center space-y-4">
-          <h1 className="text-7xl font-bold tracking-tight text-white mb-2">Vaulty</h1>
+          <img src={vaultyWordmark} alt="Vaulty" className="h-10 w-auto mx-auto mb-2" />
           <div className="h-6 flex items-center justify-center">
             <p className="text-lg text-gray-400 font-medium">
               {displayText}

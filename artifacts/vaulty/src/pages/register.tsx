@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useLocation, Link } from "wouter";
 import { Loader2, Mail, Lock, User, Check, ShieldAlert } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import vaultyWordmark from "@/assets/vaulty-wordmark.png";
 
 export default function Register() {
   const { register } = useAuth();
@@ -64,7 +65,7 @@ export default function Register() {
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 text-white relative overflow-hidden">
       <div className="w-full max-w-sm space-y-8 relative z-10">
         <div className="text-center">
-          <h1 className="text-4xl font-black italic tracking-tighter uppercase">Vaulty Connect</h1>
+          <img src={vaultyWordmark} alt="Vaulty" className="h-10 w-auto mx-auto mb-2" />
           <p className="text-zinc-500 text-sm mt-2 font-bold uppercase tracking-widest">Join the network</p>
         </div>
 
