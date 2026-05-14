@@ -76,8 +76,6 @@ export default function Landing() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [showStory, setShowStory] = useState(false);
 
-  if (!loading && user) return <Redirect to="/home" />;
-
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
@@ -177,6 +175,8 @@ export default function Landing() {
       return () => clearInterval(userTimer);
     }
   }, [chatStarted]);
+
+  if (!loading && user) return <Redirect to="/home" />;
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
