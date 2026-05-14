@@ -25,11 +25,8 @@ export function BottomNav() {
           collection(db, "chats", chatDoc.id, "messages"),
           where("read", "==", false)
         );
-        return onSnapshot(messagesQuery, (messagesSnapshot) => {
-          const count = messagesSnapshot.docs.filter(
-            msgDoc => msgDoc.data().senderId !== user.uid
-          ).length;
-          chatUnreads[chatDoc.id] = count;
+        return onSnapshot(messagesQuery, (snap) => {
+          chatUnreads[chatDoc.id] = snap.docs.filter(d => d.data().senderId !== user.uid).length;
           setUnreadCount(Object.values(chatUnreads).reduce((s, c) => s + c, 0));
         });
       });
@@ -63,135 +60,135 @@ export function BottomNav() {
       initial={{ y: 30, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+      className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50"
+      style={{ paddingTop: 20 }}
     >
-      {/* Outer wrapper — overflow visible so active bubble pokes above */}
-      <div style={{ position: "relative", paddingTop: 28 }}>
+      {/* Dark glass pill — overflow visible so active bubble pokes above */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-end",
+          gap: 5,
+          padding: "0 10px 8px 10px",
+          borderRadius: 999,
+          overflow: "visible",
+          background: "rgba(13,13,15,0.90)",
+          backdropFilter: "blur(32px)",
+          WebkitBackdropFilter: "blur(32px)",
+          border: "1px solid rgba(255,255,255,0.09)",
+          boxShadow: "0 8px 40px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.06)",
+        }}
+      >
+        {items.map((item) => {
+          let isActive = false;
+          if (item.href === "/home") isActive = location === "/home";
+          else if (item.href === "/messages") isActive = location.startsWith("/messages");
+          else isActive = location.startsWith(item.href);
 
-        {/* Dark glass pill */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "8px 10px",
-            borderRadius: 60,
-            background: "rgba(14,14,16,0.88)",
-            backdropFilter: "blur(30px)",
-            WebkitBackdropFilter: "blur(30px)",
-            border: "1px solid rgba(255,255,255,0.09)",
-            boxShadow: "0 8px 40px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.07)",
-          }}
-        >
-          {items.map((item) => {
-            let isActive = false;
-            if (item.href === "/home") isActive = location === "/home";
-            else if (item.href === "/messages") isActive = location.startsWith("/messages");
-            else isActive = location.startsWith(item.href);
-
-            return (
-              <Link key={item.href} href={item.href}>
-                <motion.div
-                  whileTap={{ scale: 0.88 }}
-                  style={{ position: "relative", cursor: "pointer" }}
-                >
-                  {/* Active: big circle that rises above the pill */}
-                  <AnimatePresence>
-                    {isActive && (
-                      <motion.div
-                        key="bubble"
-                        layoutId="nav-active-bubble"
-                        initial={{ scale: 0.5, opacity: 0, y: 20 }}
-                        animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.5, opacity: 0, y: 20 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 28 }}
-                        style={{
-                          position: "absolute",
-                          left: "50%",
-                          transform: "translateX(-50%)",
-                          bottom: "calc(100% + 4px)",
-                          width: 62,
-                          height: 62,
-                          borderRadius: "50%",
-                          padding: 3,
-                          background:
-                            "conic-gradient(from 180deg, #b5ff4d, #00e5ff, #c200ff, #ff3366, #ff9500, #b5ff4d)",
-                          boxShadow:
-                            "0 0 20px rgba(181,255,77,0.4), 0 6px 30px rgba(0,0,0,0.6)",
-                          zIndex: 10,
-                        }}
-                      >
-                        {/* Lime green inner circle */}
-                        <div
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            borderRadius: "50%",
-                            background:
-                              "linear-gradient(145deg, #ccff44 0%, #96e600 100%)",
-                            boxShadow:
-                              "inset 0 2px 8px rgba(255,255,255,0.4), inset 0 -2px 6px rgba(0,0,0,0.25)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <item.icon
-                            style={{
-                              width: 24,
-                              height: 24,
-                              color: "#0a1200",
-                              strokeWidth: 2.2,
-                            }}
-                          />
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Capsule (always rendered — the pill shape for each item) */}
-                  <div
+          return (
+            <Link key={item.href} href={item.href}>
+              <motion.div
+                whileTap={{ scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                style={{ cursor: "pointer" }}
+              >
+                {isActive ? (
+                  /* ── ACTIVE ITEM: circle that rises slightly above the pill ── */
+                  <motion.div
+                    layoutId="nav-active"
+                    initial={{ scale: 0.7, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 380, damping: 26 }}
                     style={{
-                      width: 64,
-                      height: 52,
-                      borderRadius: 26,
-                      background: isActive
-                        ? "rgba(255,255,255,0.04)"
-                        : "rgba(255,255,255,0.07)",
-                      border: "1px solid rgba(255,255,255,0.08)",
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "center",
-                      justifyContent: "flex-end",
-                      paddingBottom: 7,
-                      gap: 3,
-                      position: "relative",
+                      width: 68,
+                      marginTop: -14,
                     }}
                   >
-                    {/* Icon — hidden on active (replaced by floating bubble above) */}
-                    {!isActive && (
-                      <item.icon
+                    {/* Colorful ring */}
+                    <div
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: "50%",
+                        padding: 3,
+                        background:
+                          "conic-gradient(from 0deg, #aaff3a, #00eeff, #cc00ff, #ff2255, #ff9900, #aaff3a)",
+                        boxShadow:
+                          "0 0 16px rgba(170,255,58,0.5), 0 4px 20px rgba(0,0,0,0.6)",
+                      }}
+                    >
+                      {/* Lime green inner circle */}
+                      <div
                         style={{
-                          width: 20,
-                          height: 20,
-                          color: "rgba(255,255,255,0.55)",
-                          strokeWidth: 1.8,
+                          width: "100%",
+                          height: "100%",
+                          borderRadius: "50%",
+                          background:
+                            "linear-gradient(145deg, #ccff44 0%, #90e000 100%)",
+                          boxShadow:
+                            "inset 0 2px 8px rgba(255,255,255,0.45), inset 0 -2px 5px rgba(0,0,0,0.2)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
                         }}
-                      />
-                    )}
-                    {isActive && <div style={{ height: 20 }} />}
+                      >
+                        <item.icon
+                          style={{ width: 23, height: 23, color: "#0d1a00", strokeWidth: 2.3 }}
+                        />
+                      </div>
+                    </div>
 
                     {/* Label */}
                     <span
                       style={{
                         fontSize: 10,
-                        fontWeight: 600,
-                        letterSpacing: "0.03em",
+                        fontWeight: 700,
+                        letterSpacing: "0.02em",
+                        color: "#aaff3a",
+                        marginTop: 5,
+                        textShadow: "0 0 10px rgba(170,255,58,0.6)",
                         lineHeight: 1,
-                        color: isActive ? "#b5ff4d" : "rgba(255,255,255,0.5)",
-                        textShadow: isActive
-                          ? "0 0 10px rgba(181,255,77,0.55)"
-                          : "none",
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                  </motion.div>
+                ) : (
+                  /* ── INACTIVE ITEM: dark capsule with icon + label ── */
+                  <div
+                    style={{
+                      width: 64,
+                      height: 56,
+                      borderRadius: 28,
+                      background: "rgba(255,255,255,0.07)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 5,
+                      position: "relative",
+                      marginTop: 8,
+                    }}
+                  >
+                    <item.icon
+                      style={{
+                        width: 20,
+                        height: 20,
+                        color: "rgba(255,255,255,0.55)",
+                        strokeWidth: 1.8,
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 600,
+                        color: "rgba(255,255,255,0.5)",
+                        letterSpacing: "0.02em",
+                        lineHeight: 1,
                       }}
                     >
                       {item.label}
@@ -217,7 +214,6 @@ export function BottomNav() {
                           alignItems: "center",
                           justifyContent: "center",
                           padding: "0 3px",
-                          zIndex: 20,
                           boxShadow: "0 2px 6px rgba(0,0,0,0.4)",
                         }}
                       >
@@ -225,11 +221,11 @@ export function BottomNav() {
                       </motion.div>
                     )}
                   </div>
-                </motion.div>
-              </Link>
-            );
-          })}
-        </div>
+                )}
+              </motion.div>
+            </Link>
+          );
+        })}
       </div>
     </motion.div>
   );
