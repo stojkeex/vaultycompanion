@@ -7,7 +7,6 @@ import { ChevronLeft, Edit, Search, Plus, MessageSquare, Sparkles } from "lucide
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import verifiedBadge from '@assets/verified_badge.png';
 import { motion } from "framer-motion";
 
 interface ChatPreview {
@@ -269,7 +268,7 @@ export default function RecentChats() {
                       <div className="flex items-center gap-1.5 truncate">
                         <h3 className="font-black uppercase italic tracking-tighter text-lg">{chat.otherUser?.displayName || "Unknown"}</h3>
                         {chat.otherUser?.badges?.includes("verified") && (
-                          <img src={verifiedBadge} alt="Verified" className="w-5 h-5 flex-shrink-0" />
+                          <svg className="w-5 h-5 flex-shrink-0 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/><circle cx="12" cy="12" r="11" fill="none" stroke="currentColor" strokeWidth="2"/></svg>
                         )}
                       </div>
                       {chat.unreadCount > 0 && (
