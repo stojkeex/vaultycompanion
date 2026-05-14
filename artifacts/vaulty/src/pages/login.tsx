@@ -4,6 +4,7 @@ import { useLocation, Link } from "wouter";
 import { Loader2, Mail, Lock, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import vaultyWordmark from "@/assets/vaulty-wordmark.png";
+import landingBg from "@assets/IMG_1135_1778754185910.jpeg";
 
 const sentences = [
   "Master your financial future with Vaulty.",
@@ -103,21 +104,11 @@ export default function Login() {
   };
 
   return (
-    <div 
-      className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden text-white font-sans"
-      style={{
-        backgroundColor: '#000',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
-      }}
-    >
-      {/* Overlay for better readability */}
-      <div className="absolute inset-0 bg-black/30 z-0" />
-      {/* Space Background Effect */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)] opacity-30" />
-        <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-white/5 blur-[120px] rounded-full opacity-20 animate-pulse" />
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden text-white font-sans">
+      {/* Background image */}
+      <div className="fixed inset-0 z-0">
+        <img src={landingBg} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-black/50" />
       </div>
 
       <div className="w-full max-w-sm relative z-10 flex flex-col items-center space-y-12">

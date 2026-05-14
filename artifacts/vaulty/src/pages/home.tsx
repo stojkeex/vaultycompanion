@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import vaultyWordmark from "@/assets/vaulty-wordmark.png";
 import { useAuth } from "@/contexts/auth-context";
 import { useNotifications } from "@/contexts/notification-context";
 import { useLocation, Link } from "wouter";
@@ -212,7 +213,7 @@ export default function Home() {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <h1 className="text-xl font-black italic tracking-tighter uppercase font-serif">Vaulty</h1>
+          <img src={vaultyWordmark} alt="Vaulty" className="h-6 w-auto" />
           <div className="flex items-center gap-2">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 w-3.5 h-3.5" />

@@ -4,6 +4,7 @@ import { useLocation, Link } from "wouter";
 import { Loader2, Mail, Lock, User, Check, ShieldAlert } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import vaultyWordmark from "@/assets/vaulty-wordmark.png";
+import landingBg from "@assets/IMG_1135_1778754185910.jpeg";
 
 export default function Register() {
   const { register } = useAuth();
@@ -62,7 +63,11 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 text-white relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-white relative overflow-hidden">
+      <div className="fixed inset-0 z-0">
+        <img src={landingBg} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-black/50" />
+      </div>
       <div className="w-full max-w-sm space-y-8 relative z-10">
         <div className="text-center">
           <img src={vaultyWordmark} alt="Vaulty" className="h-10 w-auto mx-auto mb-2" />
