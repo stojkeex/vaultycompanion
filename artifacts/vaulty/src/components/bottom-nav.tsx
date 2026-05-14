@@ -4,99 +4,45 @@ import { useAuth } from "@/contexts/auth-context";
 import { db } from "@/lib/firebase";
 import { collection, query, onSnapshot, where } from "firebase/firestore";
 
+import homeIcon from "@assets/0A3BEBF9-26FF-48A1-A366-528733C1D820_1778774657947.jpeg";
+import searchIcon from "@assets/D016AA95-B692-485A-9C9B-D11838E6F954_1778774657947.jpeg";
+import createIcon from "@assets/71F75B47-DC5D-4C31-923C-180E31E48954_1778774657947.jpeg";
+import chatIcon from "@assets/7C9486EB-3316-4526-AF84-A4C49D166F83_1778774657947.jpeg";
+import premiumIcon from "@assets/F3BFEC33-FBA0-4FB7-8A02-42465D31B188_1778774657947.jpeg";
+
 interface TabItem {
   id: number;
   href: string;
   label: string;
-  color: string;
-  icon: (active: boolean) => React.ReactNode;
+  img: string;
 }
 
 const TABS: TabItem[] = [
-  {
-    id: 0,
-    href: "/home",
-    label: "Home",
-    color: "#FF3B30",
-    icon: (active) => (
-      <svg
-        className={`w-6 h-6 transition-colors duration-300 ${active ? "text-white" : "text-white/40"}`}
-        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-      >
-        <circle cx="12" cy="12" r="9" strokeOpacity={active ? 0.4 : 0.2} />
-        <path d="M12 3a9 9 0 0 1 9 9" stroke="#FF3B30" strokeLinecap="round" />
-        <path d="M12 6a6 6 0 0 1 6 6" stroke="#4CD964" strokeLinecap="round" />
-        <path d="M12 9a3 3 0 0 1 3 3" stroke="#007AFF" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
-    id: 1,
-    href: "/discover",
-    label: "Search",
-    color: "#A4FF00",
-    icon: (active) => (
-      <svg
-        className={`w-6 h-6 transition-colors duration-300 ${active ? "text-[#A4FF00]" : "text-white/40"}`}
-        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-        strokeLinecap="round" strokeLinejoin="round"
-      >
-        <path d="M23 6l-9.5 9.5-5-5L1 18" />
-        <path d="M17 6h6v6" />
-      </svg>
-    ),
-  },
-  {
-    id: 2,
-    href: "/create-companion",
-    label: "Create",
-    color: "#A4FF00",
-    icon: (active) => (
-      <div
-        className={`p-1.5 rounded-full transition-all duration-300 ${
-          active ? "bg-[#A4FF00] scale-110 shadow-[0_0_15px_rgba(164,255,0,0.5)]" : "bg-[#1C1C1E]"
-        }`}
-      >
-        <svg
-          className={`w-4 h-4 ${active ? "text-black" : "text-white/40"}`}
-          viewBox="0 0 24 24" fill="currentColor"
-        >
-          <path d="M20.5 19l-4.39-2.1c-.57-.27-1.11-.63-1.61-1.04l-2.5-2.05c-.32-.27-.5-.67-.5-1.1V9c0-.55.45-1 1-1h.5c.55 0 1 .45 1 1v2h1V9c0-1.1-.9-2-2-2h-1c-1.1 0-2 .9-2 2v3.5c0 .35.1.69.28.98l2.42 3.91c.21.34.52.61.88.79L19.5 21l1-2zM12 6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM7 14l-1-1-3 3 1.5 1.5L7 15v-1z" />
-        </svg>
-      </div>
-    ),
-  },
-  {
-    id: 3,
-    href: "/messages",
-    label: "Chat",
-    color: "#A4FF00",
-    icon: (active) => (
-      <svg
-        className={`w-6 h-6 transition-colors duration-300 ${active ? "text-[#A4FF00]" : "text-white/40"}`}
-        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
-        strokeLinecap="round" strokeLinejoin="round"
-      >
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-      </svg>
-    ),
-  },
-  {
-    id: 4,
-    href: "/premium",
-    label: "Premium",
-    color: "#A4FF00",
-    icon: (active) => (
-      <svg
-        className={`w-6 h-6 transition-colors duration-300 ${active ? "text-[#A4FF00]" : "text-white/40"}`}
-        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
-        strokeLinecap="round" strokeLinejoin="round"
-      >
-        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-      </svg>
-    ),
-  },
+  { id: 0, href: "/home",             label: "Home",    img: homeIcon    },
+  { id: 1, href: "/discover",         label: "Search",  img: searchIcon  },
+  { id: 2, href: "/create-companion", label: "Create",  img: createIcon  },
+  { id: 3, href: "/messages",         label: "Chat",    img: chatIcon    },
+  { id: 4, href: "/premium",          label: "Premium", img: premiumIcon },
 ];
+
+function NavIcon({ src, active }: { src: string; active: boolean }) {
+  return (
+    <div className="relative w-7 h-7 flex items-center justify-center">
+      <img
+        src={src}
+        alt=""
+        style={{
+          mixBlendMode: "screen",
+          filter: active
+            ? "none"
+            : "grayscale(1) brightness(3)",
+          transition: "filter 0.3s ease",
+        }}
+        className="w-7 h-7 object-contain"
+      />
+    </div>
+  );
+}
 
 export function BottomNav() {
   const [location, navigate] = useLocation();
@@ -149,7 +95,7 @@ export function BottomNav() {
     else if (location.startsWith("/create-companion")) idx = 2;
     else if (location.startsWith("/messages")) idx = 3;
     else if (location.startsWith("/premium")) idx = 4;
-    else return; // unknown route, don't move bubble
+    else return;
     setActiveIndex(idx);
   }, [location]);
 
@@ -300,7 +246,6 @@ export function BottomNav() {
     };
   }, [isDragging, onMove, onEnd]);
 
-  // Show on main nav pages only
   const mainPages = ["/home", "/discover", "/create-companion", "/messages", "/premium"];
   if (!mainPages.some(p => location === p || location.startsWith(p + "?"))) return null;
 
@@ -382,39 +327,41 @@ export function BottomNav() {
           </div>
 
           {/* Tabs */}
-          {TABS.map((tab, i) => (
-            <div
-              key={tab.id}
-              onClick={() => !isDragging && !showSettings && snapToIndex(i, true)}
-              className="relative z-20 flex flex-col items-center justify-center flex-1 h-full cursor-pointer transition-transform duration-200 active:scale-90"
-            >
+          {TABS.map((tab, i) => {
+            const isActive = activeIndex === i;
+            return (
               <div
-                className={`transition-all duration-500 ${
-                  activeIndex === i ? "scale-110 -translate-y-0.5" : "scale-100 opacity-100"
-                }`}
+                key={tab.id}
+                onClick={() => !isDragging && !showSettings && snapToIndex(i, true)}
+                className="relative z-20 flex flex-col items-center justify-center flex-1 h-full cursor-pointer transition-transform duration-200 active:scale-90"
               >
-                <div className="relative">
-                  {tab.icon(activeIndex === i)}
-                  {/* Unread badge */}
-                  {tab.href === "/messages" && unreadCount > 0 && (
-                    <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[8px] font-bold rounded-full min-w-[14px] h-[14px] flex items-center justify-center px-0.5 shadow-md">
-                      {unreadCount > 99 ? "99+" : unreadCount}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {!hideLabels && (
-                <span
-                  className={`mt-1.5 text-[11px] tracking-tight transition-all duration-500 font-semibold text-white ${
-                    activeIndex === i ? "opacity-100" : "opacity-40"
+                <div
+                  className={`transition-all duration-500 ${
+                    isActive ? "scale-110 -translate-y-0.5" : "scale-100"
                   }`}
                 >
-                  {tab.label}
-                </span>
-              )}
-            </div>
-          ))}
+                  <div className="relative">
+                    <NavIcon src={tab.img} active={isActive} />
+                    {tab.href === "/messages" && unreadCount > 0 && (
+                      <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[8px] font-bold rounded-full min-w-[14px] h-[14px] flex items-center justify-center px-0.5 shadow-md">
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {!hideLabels && (
+                  <span
+                    className={`mt-1.5 text-[11px] tracking-tight transition-all duration-500 font-semibold text-white ${
+                      isActive ? "opacity-100" : "opacity-40"
+                    }`}
+                  >
+                    {tab.label}
+                  </span>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
