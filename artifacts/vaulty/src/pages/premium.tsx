@@ -194,21 +194,28 @@ export default function Premium() {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center overflow-x-hidden relative">
 
-      {/* ── Background rays ── */}
+      {/* ── Background rays (logo gradient: cyan → blue → pink) ── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* top-right ray */}
+        {/* top-right: cyan/blue glow */}
         <div style={{
-          position: "absolute", top: -200, right: -100,
-          width: 600, height: 600, borderRadius: "50%",
-          background: "conic-gradient(from 200deg, transparent 60deg, rgba(120,40,255,0.18) 90deg, rgba(200,60,255,0.08) 120deg, transparent 160deg)",
-          filter: "blur(40px)",
+          position: "absolute", top: -180, right: -120,
+          width: 550, height: 550, borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(34,211,238,0.13) 0%, rgba(59,130,246,0.10) 40%, transparent 70%)",
+          filter: "blur(30px)",
         }} />
-        {/* bottom-left ray */}
+        {/* bottom-left: pink/blue glow */}
         <div style={{
-          position: "absolute", bottom: -150, left: -100,
-          width: 500, height: 500, borderRadius: "50%",
-          background: "conic-gradient(from 30deg, transparent 50deg, rgba(100,20,255,0.15) 80deg, rgba(180,40,200,0.08) 110deg, transparent 150deg)",
-          filter: "blur(50px)",
+          position: "absolute", bottom: -120, left: -120,
+          width: 480, height: 480, borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(236,72,153,0.13) 0%, rgba(59,130,246,0.08) 40%, transparent 70%)",
+          filter: "blur(35px)",
+        }} />
+        {/* center subtle streak */}
+        <div style={{
+          position: "absolute", top: "30%", left: "50%", transform: "translateX(-50%)",
+          width: 300, height: 2,
+          background: "linear-gradient(90deg, transparent, rgba(34,211,238,0.15), rgba(236,72,153,0.15), transparent)",
+          filter: "blur(8px)",
         }} />
       </div>
 
@@ -236,7 +243,7 @@ export default function Premium() {
             className="text-4xl font-black tracking-tight"
             style={{ letterSpacing: "-0.01em" }}
           >
-            VAULTY<span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(135deg,#6ec6ff,#a855f7)" }}>+</span>
+            VAULTY<span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(90deg,#22d3ee,#3b82f6,#ec4899)" }}>+</span>
           </h1>
           <p className="text-gray-400 text-sm mt-1">Unlock everything. Experience more.</p>
         </motion.div>
@@ -248,10 +255,10 @@ export default function Premium() {
           transition={{ delay: 0.15 }}
           className="mb-5 flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-semibold"
           style={{
-            background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(255,255,255,0.14)",
+            background: "rgba(34,211,238,0.06)",
+            border: "1px solid rgba(34,211,238,0.25)",
             backdropFilter: "blur(12px)",
-            color: "#c4b5fd",
+            color: "#22d3ee",
           }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
@@ -265,9 +272,10 @@ export default function Premium() {
           transition={{ delay: 0.2 }}
           className="w-full rounded-3xl overflow-hidden mb-6"
           style={{
-            background: "rgba(16,14,30,0.85)",
-            border: "1px solid rgba(120,80,255,0.25)",
+            background: "rgba(10,12,20,0.88)",
+            border: "1px solid rgba(34,211,238,0.15)",
             backdropFilter: "blur(20px)",
+            boxShadow: "0 0 0 0.5px rgba(236,72,153,0.08) inset",
           }}
         >
           {FEATURES.map((f, i) => (
@@ -277,9 +285,9 @@ export default function Premium() {
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                   style={{
-                    background: "rgba(90,50,200,0.25)",
-                    border: "1px solid rgba(120,80,255,0.2)",
-                    color: "#a78bfa",
+                    background: "rgba(34,211,238,0.10)",
+                    border: "1px solid rgba(34,211,238,0.20)",
+                    color: "#22d3ee",
                   }}
                 >
                   {f.icon}
@@ -287,14 +295,14 @@ export default function Premium() {
                 {/* text */}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-white leading-tight">{f.title}</p>
-                  <p className="text-xs text-gray-400 leading-tight mt-0.5">{f.subtitle}</p>
+                  <p className="text-xs text-gray-500 leading-tight mt-0.5">{f.subtitle}</p>
                 </div>
                 {/* check */}
                 <div
                   className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
-                  style={{ border: "1.5px solid rgba(120,80,255,0.5)" }}
+                  style={{ border: "1.5px solid rgba(59,130,246,0.5)" }}
                 >
-                  <Check size={12} className="text-purple-400" />
+                  <Check size={12} style={{ color: "#3b82f6" }} />
                 </div>
               </div>
               {i < FEATURES.length - 1 && (
@@ -318,7 +326,7 @@ export default function Premium() {
             )}
             <span
               className="text-6xl font-black"
-              style={{ backgroundImage: "linear-gradient(135deg,#38bdf8,#818cf8,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
+              style={{ backgroundImage: "linear-gradient(90deg,#22d3ee,#3b82f6,#ec4899)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
             >
               {sym}{currentPrice}
             </span>
@@ -344,8 +352,8 @@ export default function Premium() {
           style={{
             background: hasVaultyPlus
               ? "rgba(255,255,255,0.1)"
-              : "linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #ec4899 100%)",
-            boxShadow: hasVaultyPlus ? "none" : "0 8px 30px rgba(129,140,248,0.4)",
+              : "linear-gradient(90deg, #22d3ee 0%, #3b82f6 50%, #ec4899 100%)",
+            boxShadow: hasVaultyPlus ? "none" : "0 8px 32px rgba(236,72,153,0.35), 0 2px 12px rgba(34,211,238,0.2)",
           }}
         >
           <Crown size={18} />
