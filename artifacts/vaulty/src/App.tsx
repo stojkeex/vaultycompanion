@@ -36,8 +36,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { IncomingCallModal } from "@/components/incoming-call-modal";
 import { ActiveCallModal } from "@/components/active-call-modal";
 
-import { LoadingScreen } from "@/components/loading-screen";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { FloatingAdminButton } from "@/components/admin/floating-admin-button";
 import { RatingProvider } from "@/components/rating-provider";
 import { ThemeProvider, useTheme } from "@/contexts/theme-context";
@@ -111,7 +110,6 @@ import { ChristmasOfferModal } from "@/components/christmas-offer-modal";
 import { PremiumThanksProvider } from "@/components/premium-thanks-modal";
 
 function AppInner() {
-  const [showSplash, setShowSplash] = useState(true);
   const [location] = useLocation();
   const isLanding = location === "/";
 
@@ -134,16 +132,10 @@ function AppInner() {
 
   return (
     <>
-      {showSplash && <LoadingScreen onComplete={() => setShowSplash(false)} />}
-      {!showSplash && (
-        <>
-          <ScrollToTop />
-          <ChristmasOfferModal />
-          <Router />
-          {!isLanding && <BottomNav />}
-          <Toaster />
-        </>
-      )}
+      <ScrollToTop />
+      <Router />
+      {!isLanding && <BottomNav />}
+      <Toaster />
     </>
   );
 }

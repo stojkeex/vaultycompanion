@@ -28,7 +28,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
           <img 
             src={vaultyLogo}
             alt="Vaulty Logo" 
-            className="relative w-full h-full object-contain animate-pulse"
+            className="relative w-full h-full object-contain"
           />
         </div>
       </div>

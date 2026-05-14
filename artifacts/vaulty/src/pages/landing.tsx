@@ -6,8 +6,9 @@ import vaultyLogo from "@/assets/vaulty_logo.png";
 import astroPortraitImg from "@/assets/vaulty_logo.png";
 import vaultyStoryBg from "@assets/IMG_1135_1778754185910.jpeg";
 import { featuresData } from "@/lib/features-data";
+import { LoadingScreen } from "@/components/loading-screen";
 
-function FeatureCard({ feature, setLocation }: { feature: typeof featuresData[0], setLocation: any }) {
+function FeatureCard({ feature, onGetStarted }: { feature: typeof featuresData[0], onGetStarted: () => void }) {
   const [isFlipped, setIsFlipped] = useState(false);
 
   return (
@@ -42,7 +43,7 @@ function FeatureCard({ feature, setLocation }: { feature: typeof featuresData[0]
           <h3 className="text-2xl font-bold mb-4 text-indigo-300">{feature.backTitle}</h3>
           <p className="text-white/70 font-light leading-relaxed mb-8">{feature.backDesc}</p>
           <button
-            onClick={(e) => { e.stopPropagation(); setLocation('/login'); }}
+            onClick={(e) => { e.stopPropagation(); onGetStarted(); }}
             className="px-8 py-3 bg-white text-black font-semibold rounded-full hover:bg-gray-200 transition-all active:scale-95 w-full mt-auto shadow-[0_0_20px_rgba(255,255,255,0.2)]"
           >
             Get Started
@@ -55,6 +56,7 @@ function FeatureCard({ feature, setLocation }: { feature: typeof featuresData[0]
 
 export default function Landing() {
   const [, setLocation] = useLocation();
+  const [showLoading, setShowLoading] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [scrollProgress, setScrollProgress] = useState(0);
   const [chatMessage, setChatMessage] = useState("");
@@ -191,6 +193,10 @@ export default function Landing() {
     { question: "What are Vaulty Credits and Points?", answer: "Vaulty Points (VP) are earned through daily quests, inviting friends, and completing challenges — then spent on exclusive content and rewards. Vaulty Credits (VC) are used for premium purchases within the platform." }
   ];
 
+  if (showLoading) {
+    return <LoadingScreen onComplete={() => setLocation('/login')} />;
+  }
+
   return (
     <div className="min-h-screen text-white overflow-x-hidden font-sans relative">
       {/* Background */}
@@ -235,7 +241,7 @@ export default function Landing() {
           </p>
           <div className="flex flex-col items-center gap-4 pt-4">
             <motion.button
-              onClick={() => setLocation('/login')}
+              onClick={() => setShowLoading(true)}
               className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-semibold rounded-full hover:bg-gray-100 transition-all group shadow-[0_0_40px_rgba(255,255,255,0.2)]"
               whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
             >
@@ -348,7 +354,7 @@ export default function Landing() {
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {featuresData.map((feature, idx) => (
               <motion.div key={feature.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: idx * 0.1, duration: 0.5 }}>
-                <FeatureCard feature={feature} setLocation={setLocation} />
+                <FeatureCard feature={feature} onGetStarted={() => setShowLoading(true)} />
               </motion.div>
             ))}
           </div>
@@ -379,7 +385,7 @@ export default function Landing() {
                     <li key={f} className="flex items-center gap-3 text-sm text-white/80"><Check className="w-4 h-4 text-indigo-400" /> {f}</li>
                   ))}
                 </ul>
-                <button onClick={() => setLocation('/login')}
+                <button onClick={() => setShowLoading(true)}
                   className={`w-full py-3 rounded-full font-medium transition-colors ${plan.highlighted ? "bg-white text-black hover:bg-gray-200 font-bold" : "border border-white/20 hover:bg-white/10"}`}>
                   {plan.cta}
                 </button>
