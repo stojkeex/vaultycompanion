@@ -43,6 +43,7 @@ import { RatingProvider } from "@/components/rating-provider";
 import { ThemeProvider, useTheme } from "@/contexts/theme-context";
 
 import TOSPage from "@/pages/tos";
+import Landing from "@/pages/landing";
 
 // Protected Route Component
 function ProtectedRoute({ component: Component, hideNav = false }: { component: React.ComponentType, hideNav?: boolean }) {
@@ -70,7 +71,7 @@ function Router() {
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
         <Route path="/create-profile" component={() => <ProtectedRoute component={CreateProfile} hideNav={true} />} />
-        <Route path="/" component={() => <Redirect to="/home" />} />
+        <Route path="/" component={Landing} />
         
         {/* Home is now using the new Home component with correct design */}
         <Route path="/home" component={() => <ProtectedRoute component={Home} />} />
