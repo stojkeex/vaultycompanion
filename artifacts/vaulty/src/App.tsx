@@ -110,28 +110,22 @@ function Router() {
 import { ChristmasOfferModal } from "@/components/christmas-offer-modal";
 import { PremiumThanksProvider } from "@/components/premium-thanks-modal";
 
-function App() {
+function AppInner() {
   const [showSplash, setShowSplash] = useState(true);
+  const [location] = useLocation();
+  const isLanding = location === "/";
 
-  // Protect all images from being saved/downloaded
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target.tagName === 'IMG') {
-        e.preventDefault();
-      }
+      if (target.tagName === 'IMG') e.preventDefault();
     };
-
     const handleDragStart = (e: DragEvent) => {
       const target = e.target as HTMLElement;
-      if (target.tagName === 'IMG') {
-        e.preventDefault();
-      }
+      if (target.tagName === 'IMG') e.preventDefault();
     };
-
     document.addEventListener('contextmenu', handleContextMenu, true);
     document.addEventListener('dragstart', handleDragStart, true);
-
     return () => {
       document.removeEventListener('contextmenu', handleContextMenu, true);
       document.removeEventListener('dragstart', handleDragStart, true);
@@ -139,36 +133,42 @@ function App() {
   }, []);
 
   return (
+    <>
+      {showSplash && <LoadingScreen onComplete={() => setShowSplash(false)} />}
+      {!showSplash && (
+        <>
+          <ScrollToTop />
+          <ChristmasOfferModal />
+          <Router />
+          {!isLanding && <BottomNav />}
+          <Toaster />
+        </>
+      )}
+    </>
+  );
+}
+
+function App() {
+  return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-        <PremiumProvider>
-          <PremiumThanksProvider>
-            <CurrencyProvider>
-              <NotificationProvider>
+          <PremiumProvider>
+            <PremiumThanksProvider>
+              <CurrencyProvider>
+                <NotificationProvider>
                   <FeedProvider>
                     <TooltipProvider>
                       <RatingProvider>
-                        {showSplash && (
-                          <LoadingScreen onComplete={() => setShowSplash(false)} />
-                        )}
-                        {!showSplash && (
-                          <>
-                            <ScrollToTop />
-                            <ChristmasOfferModal />
-                            <Router />
-                            <BottomNav />
-                            <Toaster />
-                          </>
-                        )}
+                        <AppInner />
                       </RatingProvider>
                     </TooltipProvider>
                   </FeedProvider>
-              </NotificationProvider>
-            </CurrencyProvider>
-          </PremiumThanksProvider>
-        </PremiumProvider>
-      </AuthProvider>
+                </NotificationProvider>
+              </CurrencyProvider>
+            </PremiumThanksProvider>
+          </PremiumProvider>
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

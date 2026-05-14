@@ -4,7 +4,7 @@ import { ArrowRight, Instagram, Linkedin, Twitter, Mail, ChevronDown, ChevronUp,
 import { motion, AnimatePresence } from "framer-motion";
 import vaultyLogo from "@/assets/vaulty_logo.png";
 import astroPortraitImg from "@/assets/vaulty_logo.png";
-import vaultyStoryBg from "@/assets/starfield_background.jpeg";
+import vaultyStoryBg from "@assets/IMG_1135_1778754185910.jpeg";
 import { featuresData } from "@/lib/features-data";
 
 function FeatureCard({ feature, setLocation }: { feature: typeof featuresData[0], setLocation: any }) {
