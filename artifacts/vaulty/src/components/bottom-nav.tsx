@@ -61,167 +61,202 @@ export function BottomNav() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50"
-      style={{ paddingTop: 20 }}
     >
-      {/* Dark glass pill — overflow visible so active bubble pokes above */}
+      {/*
+        Outer dark glass pill — overflow visible so the active
+        circle can poke ~8 px above and below the 64 px bar.
+      */}
       <div
         style={{
           display: "flex",
-          alignItems: "flex-end",
-          gap: 5,
-          padding: "0 10px 8px 10px",
+          alignItems: "center",
+          gap: 6,
+          padding: "0 8px",
+          height: 64,
           borderRadius: 999,
           overflow: "visible",
-          background: "rgba(13,13,15,0.90)",
-          backdropFilter: "blur(32px)",
-          WebkitBackdropFilter: "blur(32px)",
+          background: "rgba(22,22,26,0.88)",
+          backdropFilter: "blur(28px)",
+          WebkitBackdropFilter: "blur(28px)",
           border: "1px solid rgba(255,255,255,0.09)",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.06)",
+          boxShadow:
+            "0 10px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.07)",
         }}
       >
         {items.map((item) => {
           let isActive = false;
-          if (item.href === "/home") isActive = location === "/home";
+          if (item.href === "/home")     isActive = location === "/home";
           else if (item.href === "/messages") isActive = location.startsWith("/messages");
-          else isActive = location.startsWith(item.href);
+          else                           isActive = location.startsWith(item.href);
 
           return (
             <Link key={item.href} href={item.href}>
               <motion.div
-                whileTap={{ scale: 0.9 }}
+                whileTap={{ scale: 0.88 }}
                 transition={{ type: "spring", stiffness: 500, damping: 20 }}
                 style={{ cursor: "pointer" }}
               >
-                {isActive ? (
-                  /* ── ACTIVE ITEM: circle that rises slightly above the pill ── */
-                  <motion.div
-                    layoutId="nav-active"
-                    initial={{ scale: 0.7, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring", stiffness: 380, damping: 26 }}
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      width: 68,
-                      marginTop: -14,
-                    }}
-                  >
-                    {/* Colorful ring */}
-                    <div
+                <AnimatePresence mode="wait">
+                  {isActive ? (
+                    /* ─────────────────────────────────────────────
+                       ACTIVE — circle taller than the pill (80 px)
+                       so it extends ±8 px beyond the 64 px bar.
+                    ───────────────────────────────────────────── */
+                    <motion.div
+                      key="active"
+                      layoutId="nav-bubble"
+                      initial={{ scale: 0.7, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.7, opacity: 0 }}
+                      transition={{ type: "spring", stiffness: 360, damping: 28 }}
                       style={{
-                        width: 60,
-                        height: 60,
+                        width: 80,
+                        height: 80,
                         borderRadius: "50%",
-                        padding: 3,
+                        /* Iridescent ring — dark oil-slick colours, green glow at top */
+                        padding: 4,
                         background:
-                          "conic-gradient(from 0deg, #aaff3a, #00eeff, #cc00ff, #ff2255, #ff9900, #aaff3a)",
+                          "conic-gradient(from 270deg, #55ff0a 0deg, #22aa30 40deg, #003320 80deg, #001510 120deg, #000008 160deg, #08000a 200deg, #180000 230deg, #050000 260deg, #001210 290deg, #00380a 330deg, #55ff0a 360deg)",
                         boxShadow:
-                          "0 0 16px rgba(170,255,58,0.5), 0 4px 20px rgba(0,0,0,0.6)",
+                          "0 0 22px rgba(85,255,10,0.35), 0 6px 24px rgba(0,0,0,0.6)",
                       }}
                     >
-                      {/* Lime green inner circle */}
+                      {/* Inner glass circle — dark frosted */}
                       <div
                         style={{
                           width: "100%",
                           height: "100%",
                           borderRadius: "50%",
-                          background:
-                            "linear-gradient(145deg, #ccff44 0%, #90e000 100%)",
-                          boxShadow:
-                            "inset 0 2px 8px rgba(255,255,255,0.45), inset 0 -2px 5px rgba(0,0,0,0.2)",
+                          background: "rgba(28,30,28,0.92)",
+                          backdropFilter: "blur(12px)",
+                          WebkitBackdropFilter: "blur(12px)",
+                          border: "1px solid rgba(255,255,255,0.08)",
                           display: "flex",
+                          flexDirection: "column",
                           alignItems: "center",
                           justifyContent: "center",
+                          gap: 4,
                         }}
                       >
-                        <item.icon
-                          style={{ width: 23, height: 23, color: "#0d1a00", strokeWidth: 2.3 }}
-                        />
+                        {/* Lime green icon circle */}
+                        <div
+                          style={{
+                            width: 38,
+                            height: 38,
+                            borderRadius: "50%",
+                            background:
+                              "radial-gradient(circle at 35% 30%, #d4ff55, #88dd00)",
+                            boxShadow:
+                              "0 2px 10px rgba(136,221,0,0.5), inset 0 1px 0 rgba(255,255,255,0.4)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                          }}
+                        >
+                          <item.icon
+                            style={{
+                              width: 18,
+                              height: 18,
+                              color: "#0d1800",
+                              strokeWidth: 2.4,
+                            }}
+                          />
+                        </div>
+
+                        {/* Label */}
+                        <span
+                          style={{
+                            fontSize: 9,
+                            fontWeight: 700,
+                            letterSpacing: "0.04em",
+                            color: "#aaff22",
+                            lineHeight: 1,
+                            textShadow: "0 0 8px rgba(170,255,34,0.7)",
+                          }}
+                        >
+                          {item.label}
+                        </span>
                       </div>
-                    </div>
-
-                    {/* Label */}
-                    <span
+                    </motion.div>
+                  ) : (
+                    /* ─────────────────────────────────────────────
+                       INACTIVE — glass capsule, fits inside 64 px bar
+                    ───────────────────────────────────────────── */
+                    <motion.div
+                      key="inactive"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.15 }}
                       style={{
-                        fontSize: 10,
-                        fontWeight: 700,
-                        letterSpacing: "0.02em",
-                        color: "#aaff3a",
-                        marginTop: 5,
-                        textShadow: "0 0 10px rgba(170,255,58,0.6)",
-                        lineHeight: 1,
+                        width: 68,
+                        height: 56,
+                        borderRadius: 28,
+                        /* Glass capsule */
+                        background: "rgba(50,52,56,0.60)",
+                        backdropFilter: "blur(14px)",
+                        WebkitBackdropFilter: "blur(14px)",
+                        border: "1px solid rgba(255,255,255,0.10)",
+                        boxShadow:
+                          "inset 0 1px 0 rgba(255,255,255,0.14), 0 2px 8px rgba(0,0,0,0.3)",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 5,
+                        position: "relative",
                       }}
                     >
-                      {item.label}
-                    </span>
-                  </motion.div>
-                ) : (
-                  /* ── INACTIVE ITEM: dark capsule with icon + label ── */
-                  <div
-                    style={{
-                      width: 64,
-                      height: 56,
-                      borderRadius: 28,
-                      background: "rgba(255,255,255,0.07)",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 5,
-                      position: "relative",
-                      marginTop: 8,
-                    }}
-                  >
-                    <item.icon
-                      style={{
-                        width: 20,
-                        height: 20,
-                        color: "rgba(255,255,255,0.55)",
-                        strokeWidth: 1.8,
-                      }}
-                    />
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 600,
-                        color: "rgba(255,255,255,0.5)",
-                        letterSpacing: "0.02em",
-                        lineHeight: 1,
-                      }}
-                    >
-                      {item.label}
-                    </span>
-
-                    {/* Unread badge */}
-                    {item.href === "/messages" && unreadCount > 0 && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
+                      <item.icon
                         style={{
-                          position: "absolute",
-                          top: 6,
-                          right: 8,
-                          background: "#ef4444",
-                          color: "#fff",
-                          fontSize: 8,
-                          fontWeight: 700,
-                          borderRadius: 99,
-                          minWidth: 16,
-                          height: 16,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          padding: "0 3px",
-                          boxShadow: "0 2px 6px rgba(0,0,0,0.4)",
+                          width: 20,
+                          height: 20,
+                          color: "rgba(255,255,255,0.82)",
+                          strokeWidth: 1.9,
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 600,
+                          color: "rgba(255,255,255,0.75)",
+                          letterSpacing: "0.02em",
+                          lineHeight: 1,
                         }}
                       >
-                        {unreadCount > 99 ? "99+" : unreadCount}
-                      </motion.div>
-                    )}
-                  </div>
-                )}
+                        {item.label}
+                      </span>
+
+                      {/* Unread badge */}
+                      {item.href === "/messages" && unreadCount > 0 && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          style={{
+                            position: "absolute",
+                            top: 6,
+                            right: 8,
+                            background: "#ef4444",
+                            color: "#fff",
+                            fontSize: 8,
+                            fontWeight: 700,
+                            borderRadius: 99,
+                            minWidth: 16,
+                            height: 16,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            padding: "0 3px",
+                            boxShadow: "0 2px 6px rgba(0,0,0,0.4)",
+                          }}
+                        >
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             </Link>
           );
