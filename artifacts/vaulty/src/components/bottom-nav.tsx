@@ -27,20 +27,27 @@ const TABS: TabItem[] = [
 
 function NavIcon({ src, active }: { src: string; active: boolean }) {
   return (
-    <div className="relative w-7 h-7 flex items-center justify-center">
-      <img
-        src={src}
-        alt=""
-        style={{
-          mixBlendMode: "screen",
-          filter: active
-            ? "none"
-            : "grayscale(1) brightness(3)",
-          transition: "filter 0.3s ease",
-        }}
-        className="w-7 h-7 object-contain"
-      />
-    </div>
+    <div
+      style={{
+        width: 28,
+        height: 28,
+        maskImage: `url(${src})`,
+        WebkitMaskImage: `url(${src})`,
+        maskSize: "contain",
+        WebkitMaskSize: "contain",
+        maskRepeat: "no-repeat",
+        WebkitMaskRepeat: "no-repeat",
+        maskPosition: "center",
+        WebkitMaskPosition: "center",
+        maskMode: "luminance",
+        WebkitMaskMode: "luminance",
+        background: active
+          ? "linear-gradient(135deg, #4477FF 0%, #8833FF 50%, #FF33EE 100%)"
+          : "white",
+        opacity: active ? 1 : 0.45,
+        transition: "background 0.3s ease, opacity 0.3s ease",
+      }}
+    />
   );
 }
 
