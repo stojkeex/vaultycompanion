@@ -204,7 +204,7 @@ export default function Home() {
       {/* Sidebar Trigger - mobile only */}
       <button 
         onClick={() => setSidebarOpen(true)}
-        className="md:hidden fixed left-0 top-1/2 -translate-y-1/2 z-40 bg-white/5 backdrop-blur-md border border-white/10 border-l-0 rounded-r-2xl p-3 hover:bg-white/10 transition-all active:scale-95 shadow-2xl"
+        className="hidden fixed left-0 top-1/2 -translate-y-1/2 z-40 bg-white/5 backdrop-blur-md border border-white/10 border-l-0 rounded-r-2xl p-3 hover:bg-white/10 transition-all active:scale-95 shadow-2xl"
       >
         <ChevronRight className="w-5 h-5 text-white/50" />
       </button>
