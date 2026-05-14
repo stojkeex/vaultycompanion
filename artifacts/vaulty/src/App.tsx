@@ -38,7 +38,6 @@ import { IncomingCallModal } from "@/components/incoming-call-modal";
 import { ActiveCallModal } from "@/components/active-call-modal";
 
 import { useEffect } from "react";
-import { FloatingAdminButton } from "@/components/admin/floating-admin-button";
 import { RatingProvider } from "@/components/rating-provider";
 import { ThemeProvider, useTheme } from "@/contexts/theme-context";
 

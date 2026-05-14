@@ -14,7 +14,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { FloatingAdminButton } from "@/components/admin/floating-admin-button";
 import { UserModeration } from "@/components/superadmin/UserModeration";
 
 // Assets
@@ -199,7 +198,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans selection:bg-white/10 overflow-x-hidden pb-32 md:pl-[280px] md:pb-0">
-      <FloatingAdminButton onClick={() => setIsAdminPanelOpen(true)} />
       
       {/* Sidebar Trigger - mobile only */}
       <button 
