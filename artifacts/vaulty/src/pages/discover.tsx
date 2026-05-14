@@ -79,7 +79,7 @@ export default function Discover() {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-black/90 backdrop-blur-xl border-b border-white/5 md:left-[280px]">
         <div className="max-w-4xl mx-auto px-4 pt-6 pb-4 space-y-4">
-          <h1 className="text-2xl font-black italic uppercase tracking-tighter">Discover</h1>
+          <img src="/discover-wordmark.png" alt="Discover" className="h-20 w-auto -ml-3" />
 
           {/* Search bar */}
           <div className="relative">
