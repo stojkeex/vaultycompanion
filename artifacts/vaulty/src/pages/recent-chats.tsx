@@ -157,36 +157,6 @@ export default function RecentChats() {
         </button>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-8 px-6 py-4 sticky top-[89px] z-40 bg-background/50 backdrop-blur-xl border-b border-border">
-        <button
-          onClick={() => setShowTab("chats")}
-          className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all relative pb-2 ${
-            showTab === "chats" ? "text-foreground" : "text-muted-foreground"
-          }`}
-        >
-          Conversations
-          {showTab === "chats" && (
-            <motion.div layoutId="tab" className="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-foreground" />
-          )}
-        </button>
-        <button
-          onClick={() => setShowTab("requests")}
-          className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all relative pb-2 ${
-            showTab === "requests" ? "text-foreground" : "text-muted-foreground"
-          }`}
-        >
-          Requests
-          {requestCount > 0 && (
-            <span className="ml-2 px-1.5 py-0.5 bg-pink-500 text-white text-[8px] rounded-full font-black">
-              {requestCount}
-            </span>
-          )}
-          {showTab === "requests" && (
-            <motion.div layoutId="tab" className="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-foreground" />
-          )}
-        </button>
-      </div>
 
       {/* Search Bar */}
       <div className="px-6 py-6">
@@ -203,8 +173,7 @@ export default function RecentChats() {
 
       {/* Content */}
       <div className="flex-1 px-6 pb-32">
-        {showTab === "chats" ? (
-          <div className="space-y-4">
+        <div className="space-y-4">
             {/* AI Companions */}
             {filteredCompanions.map(comp => (
               <motion.div 
@@ -285,35 +254,7 @@ export default function RecentChats() {
               </div>
             )}
           </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-20 bg-muted/20 rounded-[3rem] border border-dashed border-border gap-6">
-             <div className="w-20 h-20 bg-card rounded-full flex items-center justify-center border border-border">
-                <Plus className="text-muted-foreground" size={32} />
-             </div>
-             <div className="text-center space-y-2">
-               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">No new requests</p>
-               <Button
-                  variant="outline"
-                  onClick={() => setLocation("/message-requests")}
-                  className="bg-foreground text-background border-none text-[10px] font-black uppercase tracking-widest rounded-full hover:scale-105 transition-all"
-                >
-                  View archive
-                </Button>
-             </div>
-          </div>
-        )}
-      </div>
-
-      {/* Floating Bottom Button */}
-      <div className="fixed bottom-6 left-0 right-0 px-6 z-50">
-        <Button 
-          onClick={() => setLocation("/create-companion")}
-          className="w-full h-16 rounded-[2rem] bg-foreground text-background font-black uppercase tracking-[0.2em] shadow-xl hover:scale-[1.02] transition-all active:scale-95 border-none"
-        >
-          <Plus className="mr-2" size={20} strokeWidth={4} />
-          New Companion
-        </Button>
-      </div>
+        </div>
     </div>
   );
 }
