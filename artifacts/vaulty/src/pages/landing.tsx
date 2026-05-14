@@ -7,6 +7,8 @@ import astroPortraitImg from "@/assets/vaulty_logo.png";
 import vaultyStoryBg from "@assets/IMG_1135_1778754185910.jpeg";
 import { featuresData } from "@/lib/features-data";
 import { LoadingScreen } from "@/components/loading-screen";
+import { useAuth } from "@/contexts/auth-context";
+import { Redirect } from "wouter";
 
 function FeatureCard({ feature, onGetStarted }: { feature: typeof featuresData[0], onGetStarted: () => void }) {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -56,6 +58,7 @@ function FeatureCard({ feature, onGetStarted }: { feature: typeof featuresData[0
 
 export default function Landing() {
   const [, setLocation] = useLocation();
+  const { user, loading } = useAuth();
   const [showLoading, setShowLoading] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -72,6 +75,8 @@ export default function Landing() {
   });
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [showStory, setShowStory] = useState(false);
+
+  if (!loading && user) return <Redirect to="/home" />;
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
