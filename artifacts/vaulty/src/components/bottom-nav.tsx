@@ -4,70 +4,43 @@ import { useAuth } from "@/contexts/auth-context";
 import { db } from "@/lib/firebase";
 import { collection, query, onSnapshot, where } from "firebase/firestore";
 
-import homeIcon from "@assets/0A3BEBF9-26FF-48A1-A366-528733C1D820_1778774657947.jpeg";
-import searchIcon from "@assets/D016AA95-B692-485A-9C9B-D11838E6F954_1778774657947.jpeg";
-import createIcon from "@assets/71F75B47-DC5D-4C31-923C-180E31E48954_1778774657947.jpeg";
-import chatIcon from "@assets/7C9486EB-3316-4526-AF84-A4C49D166F83_1778774657947.jpeg";
-import premiumIcon from "@assets/F3BFEC33-FBA0-4FB7-8A02-42465D31B188_1778774657947.jpeg";
+const ICON_URLS = {
+  home:    "/icon-home.png",
+  search:  "/icon-search.png",
+  create:  "/icon-create.png",
+  chat:    "/icon-chat.png",
+  premium: "/icon-premium.png",
+};
 
 interface TabItem {
   id: number;
   href: string;
   label: string;
-  img: string;
+  icon: string;
 }
 
 const TABS: TabItem[] = [
-  { id: 0, href: "/home",             label: "Home",    img: homeIcon    },
-  { id: 1, href: "/discover",         label: "Search",  img: searchIcon  },
-  { id: 2, href: "/create-companion", label: "Create",  img: createIcon  },
-  { id: 3, href: "/messages",         label: "Chat",    img: chatIcon    },
-  { id: 4, href: "/premium",          label: "Premium", img: premiumIcon },
+  { id: 0, href: "/home",             label: "Home",    icon: ICON_URLS.home    },
+  { id: 1, href: "/discover",         label: "Search",  icon: ICON_URLS.search  },
+  { id: 2, href: "/create-companion", label: "Create",  icon: ICON_URLS.create  },
+  { id: 3, href: "/messages",         label: "Chat",    icon: ICON_URLS.chat    },
+  { id: 4, href: "/premium",          label: "Premium", icon: ICON_URLS.premium },
 ];
 
 function NavIcon({ src, active }: { src: string; active: boolean }) {
   return (
-    <div style={{ width: 28, height: 28, position: "relative" }}>
-      {/* Gradient layer (active) */}
-      {active && (
-        <div
-          style={{
-            position: "absolute", inset: 0,
-            maskImage: `url(${src})`,
-            WebkitMaskImage: `url(${src})`,
-            maskSize: "contain",
-            WebkitMaskSize: "contain",
-            maskRepeat: "no-repeat",
-            WebkitMaskRepeat: "no-repeat",
-            maskPosition: "center",
-            WebkitMaskPosition: "center",
-            maskMode: "luminance",
-            WebkitMaskMode: "luminance",
-            background: "linear-gradient(135deg, #55AAFF 0%, #9933FF 45%, #FF22EE 100%)",
-          }}
-        />
-      )}
-      {/* White layer (inactive) */}
-      {!active && (
-        <div
-          style={{
-            position: "absolute", inset: 0,
-            maskImage: `url(${src})`,
-            WebkitMaskImage: `url(${src})`,
-            maskSize: "contain",
-            WebkitMaskSize: "contain",
-            maskRepeat: "no-repeat",
-            WebkitMaskRepeat: "no-repeat",
-            maskPosition: "center",
-            WebkitMaskPosition: "center",
-            maskMode: "luminance",
-            WebkitMaskMode: "luminance",
-            background: "white",
-            opacity: 0.55,
-          }}
-        />
-      )}
-    </div>
+    <img
+      src={src}
+      alt=""
+      style={{
+        width: 28,
+        height: 28,
+        objectFit: "contain",
+        filter: active ? "none" : "grayscale(1) brightness(2.5)",
+        opacity: active ? 1 : 0.6,
+        transition: "filter 0.3s ease, opacity 0.3s ease",
+      }}
+    />
   );
 }
 
@@ -368,7 +341,7 @@ export function BottomNav() {
                   }`}
                 >
                   <div className="relative">
-                    <NavIcon src={tab.img} active={isActive} />
+                    <NavIcon src={tab.icon} active={isActive} />
                     {tab.href === "/messages" && unreadCount > 0 && (
                       <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[8px] font-bold rounded-full min-w-[14px] h-[14px] flex items-center justify-center px-0.5 shadow-md">
                         {unreadCount > 99 ? "99+" : unreadCount}
