@@ -1,6 +1,5 @@
 import { Link, useLocation } from "wouter";
 import { Home, MessageSquare, PlusCircle, Search, Zap } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,22 +9,17 @@ import { isSuperAdmin } from "@/lib/admins";
 
 export function BottomNav() {
   const [location] = useLocation();
-  const { user, userData } = useAuth();
+  const { user } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
-
-  const isSuper = user ? isSuperAdmin(user.email) : false;
 
   useEffect(() => {
     if (!user) { setUnreadCount(0); return; }
-
     const chatsQuery = query(
       collection(db, "chats"),
       where("participants", "array-contains", user.uid)
     );
-
     const chatsUnsubscribe = onSnapshot(chatsQuery, (chatsSnapshot) => {
       const chatUnreads: Record<string, number> = {};
-
       const unsubscribes = chatsSnapshot.docs.map(chatDoc => {
         const messagesQuery = query(
           collection(db, "chats", chatDoc.id, "messages"),
@@ -36,14 +30,11 @@ export function BottomNav() {
             msgDoc => msgDoc.data().senderId !== user.uid
           ).length;
           chatUnreads[chatDoc.id] = count;
-          const total = Object.values(chatUnreads).reduce((sum, c) => sum + c, 0);
-          setUnreadCount(total);
+          setUnreadCount(Object.values(chatUnreads).reduce((s, c) => s + c, 0));
         });
       });
-
-      return () => unsubscribes.forEach(unsub => unsub());
-    }, (error) => console.error("Error in chats listener:", error));
-
+      return () => unsubscribes.forEach(u => u());
+    });
     return () => chatsUnsubscribe();
   }, [user]);
 
@@ -56,21 +47,13 @@ export function BottomNav() {
   ], []);
 
   const shouldHide =
-    location === "/login" ||
-    location === "/register" ||
-    location === "/" ||
-    location === "/ai" ||
-    location.startsWith("/create-companion") ||
-    location.startsWith("/companion/") ||
-    location.startsWith("/messages/") ||
-    location === "/tos" ||
-    location.startsWith("/demo-trading/") ||
-    location.startsWith("/chat/private/") ||
-    location.startsWith("/course/") ||
-    location.startsWith("/coin/") ||
-    location.startsWith("/wallet") ||
-    location.startsWith("/user/") ||
-    location === "/create-post" ||
+    location === "/login" || location === "/register" || location === "/" ||
+    location === "/ai" || location.startsWith("/create-companion") ||
+    location.startsWith("/companion/") || location.startsWith("/messages/") ||
+    location === "/tos" || location.startsWith("/demo-trading/") ||
+    location.startsWith("/chat/private/") || location.startsWith("/course/") ||
+    location.startsWith("/coin/") || location.startsWith("/wallet") ||
+    location.startsWith("/user/") || location === "/create-post" ||
     location === "/create-listing";
 
   if (shouldHide) return null;
@@ -82,135 +65,171 @@ export function BottomNav() {
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
     >
-      {/* Outer glow */}
-      <div className="absolute -inset-2 rounded-full blur-2xl bg-black/30 pointer-events-none" />
+      {/* Outer wrapper — overflow visible so active bubble pokes above */}
+      <div style={{ position: "relative", paddingTop: 28 }}>
 
-      {/* Dark glass pill */}
-      <div
-        className="relative flex items-end gap-1.5 px-3 pt-5 pb-2 rounded-full"
-        style={{
-          background: "rgba(18,18,20,0.82)",
-          backdropFilter: "blur(28px)",
-          WebkitBackdropFilter: "blur(28px)",
-          border: "1px solid rgba(255,255,255,0.10)",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.08)",
-        }}
-      >
-        {items.map((item) => {
-          let isActive = false;
-          if (item.href === "/home") {
-            isActive = location === "/home";
-          } else if (item.href === "/messages") {
-            isActive = location.startsWith("/messages");
-          } else {
-            isActive = location.startsWith(item.href);
-          }
+        {/* Dark glass pill */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "8px 10px",
+            borderRadius: 60,
+            background: "rgba(14,14,16,0.88)",
+            backdropFilter: "blur(30px)",
+            WebkitBackdropFilter: "blur(30px)",
+            border: "1px solid rgba(255,255,255,0.09)",
+            boxShadow: "0 8px 40px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.07)",
+          }}
+        >
+          {items.map((item) => {
+            let isActive = false;
+            if (item.href === "/home") isActive = location === "/home";
+            else if (item.href === "/messages") isActive = location.startsWith("/messages");
+            else isActive = location.startsWith(item.href);
 
-          return (
-            <Link key={item.href} href={item.href}>
-              <motion.div
-                whileTap={{ scale: 0.9 }}
-                transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                className="relative flex flex-col items-center cursor-pointer"
-              >
-                {/* Item capsule */}
-                <div
-                  className="relative flex flex-col items-center justify-end"
-                  style={{ width: 64, minHeight: 52 }}
+            return (
+              <Link key={item.href} href={item.href}>
+                <motion.div
+                  whileTap={{ scale: 0.88 }}
+                  style={{ position: "relative", cursor: "pointer" }}
                 >
-                  <AnimatePresence mode="wait">
-                    {isActive ? (
-                      /* Active: large circle protruding above the bar */
+                  {/* Active: big circle that rises above the pill */}
+                  <AnimatePresence>
+                    {isActive && (
                       <motion.div
-                        key="active"
-                        initial={{ scale: 0.6, opacity: 0, y: 8 }}
+                        key="bubble"
+                        layoutId="nav-active-bubble"
+                        initial={{ scale: 0.5, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.6, opacity: 0, y: 8 }}
-                        transition={{ type: "spring", stiffness: 380, damping: 26 }}
-                        className="absolute left-1/2 -translate-x-1/2"
-                        style={{ bottom: 18 }}
-                      >
-                        {/* Colorful metallic ring (conic gradient) */}
-                        <div
-                          style={{
-                            width: 64,
-                            height: 64,
-                            borderRadius: "50%",
-                            padding: 3,
-                            background: "conic-gradient(from 0deg, #a8ff3e, #00e0ff, #b400ff, #ff3a6e, #ff9900, #a8ff3e)",
-                            boxShadow: "0 0 18px rgba(168,255,62,0.45), 0 4px 24px rgba(0,0,0,0.5)",
-                          }}
-                        >
-                          {/* Inner green circle */}
-                          <div
-                            className="w-full h-full rounded-full flex items-center justify-center"
-                            style={{
-                              background: "linear-gradient(145deg, #c8ff44, #8ae600)",
-                              boxShadow: "inset 0 2px 6px rgba(255,255,255,0.35), inset 0 -2px 4px rgba(0,0,0,0.2)",
-                            }}
-                          >
-                            <item.icon
-                              className="text-black"
-                              style={{ width: 26, height: 26, strokeWidth: 2.2 }}
-                            />
-                          </div>
-                        </div>
-                      </motion.div>
-                    ) : (
-                      /* Inactive: small icon in a dark capsule */
-                      <motion.div
-                        key="inactive"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.15 }}
-                        className="flex flex-col items-center justify-center rounded-full"
+                        exit={{ scale: 0.5, opacity: 0, y: 20 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 28 }}
                         style={{
-                          width: 60,
-                          height: 44,
-                          background: "rgba(255,255,255,0.07)",
-                          border: "1px solid rgba(255,255,255,0.09)",
-                          marginBottom: 2,
+                          position: "absolute",
+                          left: "50%",
+                          transform: "translateX(-50%)",
+                          bottom: "calc(100% + 4px)",
+                          width: 62,
+                          height: 62,
+                          borderRadius: "50%",
+                          padding: 3,
+                          background:
+                            "conic-gradient(from 180deg, #b5ff4d, #00e5ff, #c200ff, #ff3366, #ff9500, #b5ff4d)",
+                          boxShadow:
+                            "0 0 20px rgba(181,255,77,0.4), 0 6px 30px rgba(0,0,0,0.6)",
+                          zIndex: 10,
                         }}
                       >
-                        <item.icon
-                          className="text-white/70"
-                          style={{ width: 20, height: 20, strokeWidth: 1.8 }}
-                        />
+                        {/* Lime green inner circle */}
+                        <div
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: "50%",
+                            background:
+                              "linear-gradient(145deg, #ccff44 0%, #96e600 100%)",
+                            boxShadow:
+                              "inset 0 2px 8px rgba(255,255,255,0.4), inset 0 -2px 6px rgba(0,0,0,0.25)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <item.icon
+                            style={{
+                              width: 24,
+                              height: 24,
+                              color: "#0a1200",
+                              strokeWidth: 2.2,
+                            }}
+                          />
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
 
-                  {/* Spacer so active icon has room above */}
-                  {isActive && <div style={{ height: 50 }} />}
-
-                  {/* Label */}
-                  <span
-                    className="text-[10px] font-semibold tracking-wide mt-0.5 relative z-10"
+                  {/* Capsule (always rendered — the pill shape for each item) */}
+                  <div
                     style={{
-                      color: isActive ? "#c8ff44" : "rgba(255,255,255,0.55)",
-                      textShadow: isActive ? "0 0 10px rgba(168,255,62,0.6)" : "none",
-                      lineHeight: 1,
+                      width: 64,
+                      height: 52,
+                      borderRadius: 26,
+                      background: isActive
+                        ? "rgba(255,255,255,0.04)"
+                        : "rgba(255,255,255,0.07)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "flex-end",
+                      paddingBottom: 7,
+                      gap: 3,
+                      position: "relative",
                     }}
                   >
-                    {item.label}
-                  </span>
+                    {/* Icon — hidden on active (replaced by floating bubble above) */}
+                    {!isActive && (
+                      <item.icon
+                        style={{
+                          width: 20,
+                          height: 20,
+                          color: "rgba(255,255,255,0.55)",
+                          strokeWidth: 1.8,
+                        }}
+                      />
+                    )}
+                    {isActive && <div style={{ height: 20 }} />}
 
-                  {/* Unread badge */}
-                  {item.href === "/messages" && unreadCount > 0 && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute top-0 right-1 bg-red-500 text-white text-[8px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-lg z-20"
+                    {/* Label */}
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 600,
+                        letterSpacing: "0.03em",
+                        lineHeight: 1,
+                        color: isActive ? "#b5ff4d" : "rgba(255,255,255,0.5)",
+                        textShadow: isActive
+                          ? "0 0 10px rgba(181,255,77,0.55)"
+                          : "none",
+                      }}
                     >
-                      {unreadCount > 99 ? "99+" : unreadCount}
-                    </motion.div>
-                  )}
-                </div>
-              </motion.div>
-            </Link>
-          );
-        })}
+                      {item.label}
+                    </span>
+
+                    {/* Unread badge */}
+                    {item.href === "/messages" && unreadCount > 0 && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        style={{
+                          position: "absolute",
+                          top: 6,
+                          right: 8,
+                          background: "#ef4444",
+                          color: "#fff",
+                          fontSize: 8,
+                          fontWeight: 700,
+                          borderRadius: 99,
+                          minWidth: 16,
+                          height: 16,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          padding: "0 3px",
+                          zIndex: 20,
+                          boxShadow: "0 2px 6px rgba(0,0,0,0.4)",
+                        }}
+                      >
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </motion.div>
+                    )}
+                  </div>
+                </motion.div>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </motion.div>
   );
