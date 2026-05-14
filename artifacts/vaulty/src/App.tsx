@@ -25,6 +25,7 @@ import CompanionPreview from "@/pages/companion-preview";
 import CompanionChat from "@/pages/companion-chat";
 import LiveStream from "@/pages/live";
 import CreateCompanion from "@/pages/create-companion";
+import Discover from "@/pages/discover";
 
 import { AuthProvider, useAuth } from "@/contexts/auth-context";
 import { NotificationProvider } from "@/contexts/notification-context";
@@ -77,7 +78,7 @@ function Router() {
         {/* Support old route but redirect to home */}
         <Route path="/home/:tab" component={() => <Redirect to="/home" />} />
 
-        <Route path="/discover" component={() => <ProtectedRoute component={Home} />} />
+        <Route path="/discover" component={() => <ProtectedRoute component={Discover} />} />
         <Route path="/messages" component={() => <ProtectedRoute component={RecentChats} />} />
         <Route path="/recent-chats" component={() => <ProtectedRoute component={RecentChats} />} />
 
