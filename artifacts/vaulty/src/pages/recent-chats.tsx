@@ -4,6 +4,7 @@ import { useLocation } from "wouter";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, doc, getDoc, where } from "firebase/firestore";
 import { ChevronLeft, Edit, Search, Plus, MessageSquare, Sparkles } from "lucide-react";
+import messagesWordmark from "../assets/messages-wordmark.png";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -155,7 +156,7 @@ export default function RecentChats() {
             <ChevronLeft size={20} />
           </button>
           <div>
-            <h1 className="text-2xl font-black uppercase italic tracking-tighter inline-block bg-gradient-to-r from-cyan-400 via-blue-500 to-pink-500 bg-clip-text text-transparent [-webkit-background-clip:text]">Messages</h1>
+            <img src={messagesWordmark} alt="Messages" className="h-7 w-auto" />
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Vaulty Connect</p>
           </div>
         </div>
