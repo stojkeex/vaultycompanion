@@ -12,10 +12,10 @@ version = "1.0.0"
 [[services]]
 name = "web"
 paths = [ "/" ]
-localPort = 22570
+localPort = 8080
 
 [services.development]
-run = "PORT=22570 BASE_PATH=/ pnpm --filter @workspace/vaulty run dev"
+run = "PORT=8080 BASE_PATH=/ pnpm --filter @workspace/vaulty run dev"
 
 [services.production]
 build = [ "pnpm", "--filter", "@workspace/vaulty", "run", "build" ]
@@ -27,5 +27,5 @@ from = "/*"
 to = "/index.html"
 
 [services.env]
-PORT = "22570"
+PORT = "8080"
 BASE_PATH = "/"
