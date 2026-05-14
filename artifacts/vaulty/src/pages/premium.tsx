@@ -1,416 +1,384 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { useLocation } from "wouter";
-import { ChevronLeft, Check, Sparkles, Headset, Gift, Lock, Zap, MessageSquare, Mic, Star, X, Camera } from "lucide-react";
+import { X, Lock, Zap, MessageSquare, Mic, Star, Camera, Headset, Check, Crown } from "lucide-react";
 import { db } from "@/lib/firebase";
-import { doc, updateDoc, increment, collection, getDocs, query, where } from "firebase/firestore";
+import { doc, updateDoc, increment } from "firebase/firestore";
 import { Input } from "@/components/ui/input";
-import { addMonths } from "date-fns";
+import { Button } from "@/components/ui/button";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { usePremiumThanks } from "@/components/premium-thanks-modal";
 import { useCurrency } from "@/contexts/currency-context";
+import vaultyLogo from "@/assets/vaulty_logo.png";
 
-// Import badge images
-import badgePro from "/assets/badges/badge-pro.png";
-import badgeUltra from "/assets/badges/badge-ultra.png";
-import badgeMax from "/assets/badges/badge-max.png";
-
-// Initialize Stripe with the LIVE key
 const stripePromise = loadStripe("pk_live_51SbQJ9HChlVvIks4OVBZysQhGeehAbwISpcSDuxNYy64nTJu780uJcvR0afAzKUZhpnVkFVHPv7iUPlcIYjEIDLh00GF5Z3JoY");
 
-const CheckoutForm = ({ price, billingCycle, onSuccess, onCancel }: { 
-  price: number, 
-  billingCycle: string, 
-  onSuccess: () => void, 
-  onCancel: () => void 
+const FEATURES = [
+  {
+    icon: <Camera size={18} />,
+    title: "AI Sends You Images",
+    subtitle: "Get stunning images in every conversation.",
+  },
+  {
+    icon: <Star size={18} />,
+    title: "Over 10 Colored Chat Themes",
+    subtitle: "Personalize your chats your way.",
+  },
+  {
+    icon: <MessageSquare size={18} />,
+    title: "18+ Conversations",
+    subtitle: "More open. More freedom.",
+  },
+  {
+    icon: <Headset size={18} />,
+    title: "24h Admin Support",
+    subtitle: "We're here for you, anytime.",
+  },
+  {
+    icon: <Mic size={18} />,
+    title: "Character Sends You Voice Messages",
+    subtitle: "Hear them come to life.",
+  },
+  {
+    icon: <Zap size={18} />,
+    title: "Fewer Restrictions",
+    subtitle: "More freedom. More possibilities.",
+  },
+];
+
+/* ── Stripe checkout form ─────────────────────────────────── */
+const CheckoutForm = ({ price, billingCycle, onSuccess, onCancel }: {
+  price: number; billingCycle: string; onSuccess: () => void; onCancel: () => void;
 }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const { currency } = useCurrency();
+  const sym = currency === "EUR" ? "€" : "$";
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    if (!stripe || !elements) {
-      return;
-    }
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
     setProcessing(true);
     setError(null);
-
     try {
-      const { error: submitError } = await stripe.confirmPayment({
+      const { error: err } = await stripe.confirmPayment({
         elements,
-        confirmParams: {
-          return_url: window.location.origin + "/premium?success=true",
-        },
+        confirmParams: { return_url: window.location.origin + "/premium?success=true" },
         redirect: "if_required",
       });
-
-      if (submitError) {
-        setError(submitError.message || "Payment failed");
-        setProcessing(false);
-      } else {
-        // Payment successful
-        onSuccess();
-      }
-    } catch (err: any) {
-      setError(err.message || "An error occurred");
+      if (err) { setError(err.message || "Payment failed"); setProcessing(false); }
+      else onSuccess();
+    } catch (ex: any) {
+      setError(ex.message || "An error occurred");
       setProcessing(false);
     }
   };
 
   return (
     <div className="space-y-6">
-      <div className="space-y-4">
-        <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-          <div className="flex justify-between items-center mb-2">
-            <span className="font-medium">Vaulty+ Plan</span>
-            <span className="font-bold">{currency === 'EUR' ? '€' : '$'}{price}/{billingCycle === "monthly" ? "mo" : "yr"}</span>
-          </div>
-          <div className="text-sm text-gray-400">
-            Total to pay today
-          </div>
+      <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+        <div className="flex justify-between items-center mb-1">
+          <span className="font-medium">Vaulty+ Plan</span>
+          <span className="font-bold">{sym}{price}/{billingCycle === "monthly" ? "mo" : "yr"}</span>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-            <PaymentElement 
-              options={{
-                layout: "tabs",
-                paymentMethodOrder: ["apple_pay", "google_pay", "card"],
-              }}
-            />
-          </div>
-
-          {error && (
-            <div className="text-red-400 text-sm bg-red-400/10 p-3 rounded-md border border-red-400/20">
-              {error}
-            </div>
-          )}
-
-          <div className="flex gap-3">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onCancel}
-              className="flex-1 border-white/10 hover:bg-white/5"
-            >
-              Cancel
-            </Button>
-            <Button 
-              type="submit" 
-              disabled={!stripe || processing}
-              className="flex-1 bg-white text-black font-bold hover:bg-gray-200"
-            >
-              {processing ? "Processing..." : `Pay ${currency === 'EUR' ? '€' : '$'}${price}`}
-            </Button>
-          </div>
-        </form>
+        <div className="text-sm text-gray-400">Total to pay today</div>
       </div>
-      
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+          <PaymentElement options={{ layout: "tabs", paymentMethodOrder: ["apple_pay", "google_pay", "card"] }} />
+        </div>
+        {error && <div className="text-red-400 text-sm bg-red-400/10 p-3 rounded-md border border-red-400/20">{error}</div>}
+        <div className="flex gap-3">
+          <Button type="button" variant="outline" onClick={onCancel} className="flex-1 border-white/10 hover:bg-white/5">Cancel</Button>
+          <Button type="submit" disabled={!stripe || processing} className="flex-1 bg-white text-black font-bold hover:bg-gray-200">
+            {processing ? "Processing…" : `Pay ${sym}${price}`}
+          </Button>
+        </div>
+      </form>
       <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
-        <Lock size={12} />
-        <span>Secured by Stripe (Live Mode)</span>
+        <Lock size={12} /><span>Secured by Stripe</span>
       </div>
     </div>
   );
 };
 
 const PaymentWrapper = ({ price, billingCycle, onSuccess, onCancel }: {
-  price: number,
-  billingCycle: string,
-  onSuccess: () => void,
-  onCancel: () => void
+  price: number; billingCycle: string; onSuccess: () => void; onCancel: () => void;
 }) => {
   const [clientSecret, setClientSecret] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Create PaymentIntent as soon as the component loads
     fetch("/api/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amount: price, tier: "vaulty", billingCycle }),
     })
-      .then((res) => res.json())
-      .then((data) => {
-        setClientSecret(data.clientSecret);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        setLoading(false);
-      });
+      .then(r => r.json())
+      .then(d => { setClientSecret(d.clientSecret); setLoading(false); })
+      .catch(() => setLoading(false));
   }, [price, billingCycle]);
 
-  if (loading || !clientSecret) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-      </div>
-    );
-  }
+  if (loading || !clientSecret)
+    return <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" /></div>;
 
   return (
     <Elements stripe={stripePromise} options={{ clientSecret }}>
-      <CheckoutForm 
-        price={price} 
-        billingCycle={billingCycle}
-        onSuccess={onSuccess}
-        onCancel={onCancel}
-      />
+      <CheckoutForm price={price} billingCycle={billingCycle} onSuccess={onSuccess} onCancel={onCancel} />
     </Elements>
   );
 };
 
+/* ── Main page ────────────────────────────────────────────── */
 export default function Premium() {
   const { user, userData } = useAuth();
-  const [location, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
   const { showPremiumThanks } = usePremiumThanks();
   const { currency } = useCurrency();
-  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
-  const [selectedTier, setSelectedTier] = useState<"vaulty">("vaulty");
-  const [redeemCode, setRedeemCode] = useState("");
-  const [redeemLoading, setRedeemLoading] = useState(false);
-  const [appliedDiscount, setAppliedDiscount] = useState<any>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [promoError, setPromoError] = useState<string | null>(null);
   const [promoSuccess, setPromoSuccess] = useState<string | null>(null);
-  
-  const tiers = {
-    vaulty: {
-      name: "Vaulty+",
-      price: { monthly: 13.99, yearly: 139.99 },
-      features: [
-        { icon: <Camera size={20} />, text: "AI sends you images", check: true },
-        { icon: <Star size={20} />, text: "Over 10 colored chat themes", check: true },
-        { icon: <MessageSquare size={20} />, text: "18+ conversations (more open)", check: true },
-        { icon: <Headset size={20} />, text: "24h admin support", check: true },
-        { icon: <Mic size={20} />, text: "Character sends you voice messages", check: true },
-        { icon: <Zap size={20} />, text: "Fewer restrictions and more freedom", check: true }
-      ],
-      points: 5000,
-      demoBonus: 50000
-    }
-  };
+  const [appliedDiscount, setAppliedDiscount] = useState<any>(null);
 
-  const basePrice = tiers["vaulty"].price[billingCycle];
+  const sym = currency === "EUR" ? "€" : "$";
+  const basePrice = 13.99;
   let currentPrice = basePrice;
-  let displayDiscount = appliedDiscount;
-  
-  if (appliedDiscount && appliedDiscount.plan) {
-    if (appliedDiscount.plan !== "All" && appliedDiscount.plan.toLowerCase() !== "vaulty") {
-      displayDiscount = null;
-    }
-  }
-  
-  if (displayDiscount && displayDiscount.discount) {
-    const discountAmount = (basePrice * displayDiscount.discount) / 100;
-    currentPrice = Math.round((basePrice - discountAmount) * 100) / 100;
+  if (appliedDiscount?.discount) {
+    currentPrice = Math.round((basePrice - basePrice * appliedDiscount.discount / 100) * 100) / 100;
   }
 
-  const currentPlan = userData?.premiumPlan || userData?.subscription || "free";
-  const currentSubscription = currentPlan.toLowerCase();
-  const hasVaultyPlus = currentSubscription === "vaulty";
+  const hasVaultyPlus = (userData?.premiumPlan || userData?.subscription || "free").toLowerCase() === "vaulty";
 
   useEffect(() => {
     const stored = sessionStorage.getItem("appliedDiscount");
-    if (stored) {
-      try { setAppliedDiscount(JSON.parse(stored)); } catch (e) { setAppliedDiscount(null); }
-    }
+    if (stored) { try { setAppliedDiscount(JSON.parse(stored)); } catch {} }
   }, []);
 
-  const handleSubscribeClick = () => {
-    if (!user) return;
-    setShowPaymentModal(true);
-  };
-
   const handleApplyPromo = () => {
-    setPromoError(null);
-    setPromoSuccess(null);
-    
+    setPromoError(null); setPromoSuccess(null);
     const code = promoCode.toUpperCase().trim();
     if (!code) return;
-
-    // Mock promo codes for demonstration
-    const validCodes: Record<string, number> = {
-      "VAULTY20": 20,
-      "SAVE50": 50,
-      "PROMO10": 10,
-      "FRIEND": 15
-    };
-
-    if (validCodes[code]) {
-      const discount = validCodes[code];
-      setAppliedDiscount({
-        code,
-        discount,
-        plan: "vaulty"
-      });
-      setPromoSuccess(`Promo code applied! ${discount}% discount.`);
+    const valid: Record<string, number> = { VAULTY20: 20, SAVE50: 50, PROMO10: 10, FRIEND: 15 };
+    if (valid[code]) {
+      setAppliedDiscount({ code, discount: valid[code], plan: "vaulty" });
+      setPromoSuccess(`Promo applied! ${valid[code]}% off.`);
       setPromoCode("");
     } else {
-      setPromoError("Invalid promo code. Please try again.");
+      setPromoError("Invalid promo code.");
     }
   };
 
   const handlePaymentSuccess = async () => {
     if (!user) return;
     try {
-      const points = tiers["vaulty"].points;
-      const demoBonus = tiers["vaulty"].demoBonus;
-      const expiryDate = new Date();
-      expiryDate.setDate(expiryDate.getDate() + 30);
+      const expiry = new Date(); expiry.setDate(expiry.getDate() + 30);
       await updateDoc(doc(db, "users", user.uid), {
-        premiumPlan: "VAULTY",
-        subscription: "vaulty",
-        subscriptionDate: new Date(),
-        premiumExpiry: expiryDate,
-        vaultyPoints: increment(points),
-        demoBalance: increment(demoBonus),
-        badges: [...(userData?.badges || []).filter((b: string) => !b.includes("premium")), "premium-vaulty"]
+        premiumPlan: "VAULTY", subscription: "vaulty",
+        subscriptionDate: new Date(), premiumExpiry: expiry,
+        vaultyPoints: increment(5000), demoBalance: increment(50000),
+        badges: [...(userData?.badges || []).filter((b: string) => !b.includes("premium")), "premium-vaulty"],
       });
       setShowPaymentModal(false);
       sessionStorage.removeItem("appliedDiscount");
       setAppliedDiscount(null);
       showPremiumThanks("vaulty");
-    } catch (error) {
-      console.error("Error updating profile", error);
-    }
+    } catch (e) { console.error(e); }
   };
 
   return (
-    <div className="min-h-screen bg-black text-white relative flex flex-col items-center overflow-x-hidden">
-      {/* Background Image / Ethereal Figure */}
-      <div className="absolute top-0 left-0 w-full h-[60vh] z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black z-10" />
+    <div className="min-h-screen bg-black text-white flex flex-col items-center overflow-x-hidden relative">
+
+      {/* ── Background rays ── */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        {/* top-right ray */}
+        <div style={{
+          position: "absolute", top: -200, right: -100,
+          width: 600, height: 600, borderRadius: "50%",
+          background: "conic-gradient(from 200deg, transparent 60deg, rgba(120,40,255,0.18) 90deg, rgba(200,60,255,0.08) 120deg, transparent 160deg)",
+          filter: "blur(40px)",
+        }} />
+        {/* bottom-left ray */}
+        <div style={{
+          position: "absolute", bottom: -150, left: -100,
+          width: 500, height: 500, borderRadius: "50%",
+          background: "conic-gradient(from 30deg, transparent 50deg, rgba(100,20,255,0.15) 80deg, rgba(180,40,200,0.08) 110deg, transparent 150deg)",
+          filter: "blur(50px)",
+        }} />
       </div>
 
-      {/* Top Controls */}
-      <div className="relative z-20 w-full flex justify-between p-6">
-        <button 
+      {/* ── Close button ── */}
+      <div className="relative z-20 w-full max-w-md px-5 pt-5">
+        <button
           onClick={() => setLocation("/")}
-          className="p-2 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors"
+          className="w-9 h-9 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-colors"
         >
-          <X size={20} />
+          <X size={18} />
         </button>
       </div>
 
-      <div className="relative z-20 flex flex-col items-center w-full max-w-md px-6 pt-12 pb-6 text-center flex-1 justify-center">
-        {/* Title Section */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+      <div className="relative z-20 w-full max-w-md px-5 flex flex-col items-center">
+
+        {/* ── Logo + title ── */}
+        <motion.div
+          initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-1 mb-4"
+          transition={{ duration: 0.5 }}
+          className="flex flex-col items-center mt-4 mb-3"
         >
-          <h1 className="text-4xl font-bold tracking-tight">Vaulty+</h1>
-          <p className="text-sm text-gray-300 font-medium max-w-[280px] mx-auto leading-tight">
-            Unlock all premium features
-          </p>
+          <img src={vaultyLogo} alt="Vaulty" className="w-16 h-16 object-contain mb-3" />
+          <h1
+            className="text-4xl font-black tracking-tight"
+            style={{ letterSpacing: "-0.01em" }}
+          >
+            VAULTY<span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(135deg,#6ec6ff,#a855f7)" }}>+</span>
+          </h1>
+          <p className="text-gray-400 text-sm mt-1">Unlock everything. Experience more.</p>
         </motion.div>
 
-        {/* Scrollable Features List */}
-        <div className="w-full mb-6 px-4">
-          <div className="max-h-[220px] overflow-y-auto pr-2 space-y-3 custom-scrollbar">
-            {tiers["vaulty"].features.map((feature, idx) => (
-              <motion.div 
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                key={idx} 
-                className="flex items-center justify-between py-1"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-white/80 scale-75">{feature.icon}</span>
-                  <span className="text-xs font-medium text-white text-left">{feature.text}</span>
-                </div>
-                <Check size={14} className="text-white shrink-0" />
-              </motion.div>
-            ))}
-          </div>
-          
-          <style dangerouslySetInnerHTML={{ __html: `
-            .custom-scrollbar::-webkit-scrollbar {
-              width: 4px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-track {
-              background: rgba(255, 255, 255, 0.05);
-              border-radius: 10px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-              background: rgba(255, 255, 255, 0.1);
-              border-radius: 10px;
-            }
-          `}} />
-        </div>
-
-        {/* Pricing Display */}
-        <div className="mb-6 text-center">
-          <div className="flex flex-col items-center">
-            {appliedDiscount ? (
-              <>
-                <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-gray-500 line-through text-sm">${basePrice}</span>
-                  <span className="bg-green-500/20 text-green-400 text-[9px] px-1.5 py-0.5 rounded-full font-bold">
-                    -{appliedDiscount.discount}%
-                  </span>
-                </div>
-                <div>
-                  <span className="text-4xl font-bold text-white">${currentPrice}</span>
-                  <span className="text-[10px] text-gray-400 ml-1">{billingCycle === "monthly" ? "/mo" : "/yr"}</span>
-                </div>
-              </>
-            ) : (
-              <div>
-                <span className="text-4xl font-bold text-white">${basePrice}</span>
-                <span className="text-[10px] text-gray-400 ml-1">{billingCycle === "monthly" ? "/mo" : "/yr"}</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Action Button */}
-        <button
-          onClick={handleSubscribeClick}
-          disabled={hasVaultyPlus}
-          className="w-full py-3 rounded-xl bg-white text-black font-extrabold text-sm mb-4 active:scale-[0.98] transition-transform disabled:opacity-50"
+        {/* ── "All Premium Features" pill ── */}
+        <motion.button
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.15 }}
+          className="mb-5 flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-semibold"
+          style={{
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.14)",
+            backdropFilter: "blur(12px)",
+            color: "#c4b5fd",
+          }}
         >
-          {hasVaultyPlus ? "Current Plan" : "Subscribe Now"}
-        </button>
-      </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+          All Premium Features
+        </motion.button>
 
-      <div className="relative z-20 w-full max-w-md px-6 pb-6 text-center">
-        {/* Promo Code Input moved to bottom */}
+        {/* ── Features card ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="w-full rounded-3xl overflow-hidden mb-6"
+          style={{
+            background: "rgba(16,14,30,0.85)",
+            border: "1px solid rgba(120,80,255,0.25)",
+            backdropFilter: "blur(20px)",
+          }}
+        >
+          {FEATURES.map((f, i) => (
+            <div key={i}>
+              <div className="flex items-center gap-4 px-5 py-4">
+                {/* icon box */}
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                  style={{
+                    background: "rgba(90,50,200,0.25)",
+                    border: "1px solid rgba(120,80,255,0.2)",
+                    color: "#a78bfa",
+                  }}
+                >
+                  {f.icon}
+                </div>
+                {/* text */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-white leading-tight">{f.title}</p>
+                  <p className="text-xs text-gray-400 leading-tight mt-0.5">{f.subtitle}</p>
+                </div>
+                {/* check */}
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                  style={{ border: "1.5px solid rgba(120,80,255,0.5)" }}
+                >
+                  <Check size={12} className="text-purple-400" />
+                </div>
+              </div>
+              {i < FEATURES.length - 1 && (
+                <div className="mx-5 h-px" style={{ background: "rgba(255,255,255,0.05)" }} />
+              )}
+            </div>
+          ))}
+        </motion.div>
+
+        {/* ── Pricing ── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="flex flex-col items-center mb-5"
+        >
+          <p className="text-xs font-bold tracking-[0.2em] text-gray-500 mb-1">ONLY</p>
+          <div className="flex items-end gap-1">
+            {appliedDiscount && (
+              <span className="text-gray-500 line-through text-lg mb-1">{sym}{basePrice}</span>
+            )}
+            <span
+              className="text-6xl font-black"
+              style={{ backgroundImage: "linear-gradient(135deg,#38bdf8,#818cf8,#a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
+            >
+              {sym}{currentPrice}
+            </span>
+            <span className="text-gray-400 text-sm mb-2">/mo</span>
+          </div>
+          {appliedDiscount && (
+            <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full font-semibold">
+              -{appliedDiscount.discount}% off applied
+            </span>
+          )}
+          <p className="text-gray-500 text-xs mt-1">Cancel anytime. No hidden fees.</p>
+        </motion.div>
+
+        {/* ── Subscribe button ── */}
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => !hasVaultyPlus && user && setShowPaymentModal(true)}
+          disabled={hasVaultyPlus}
+          className="w-full py-4 rounded-2xl flex items-center justify-center gap-2.5 text-base font-extrabold text-white mb-3 disabled:opacity-60"
+          style={{
+            background: hasVaultyPlus
+              ? "rgba(255,255,255,0.1)"
+              : "linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #ec4899 100%)",
+            boxShadow: hasVaultyPlus ? "none" : "0 8px 30px rgba(129,140,248,0.4)",
+          }}
+        >
+          <Crown size={18} />
+          {hasVaultyPlus ? "Current Plan" : "Subscribe Now"}
+        </motion.button>
+
+        {/* ── Secure payment ── */}
+        <div className="flex items-center gap-1.5 text-gray-600 text-xs mb-5">
+          <Lock size={11} />
+          <span>Secure payment</span>
+        </div>
+
+        {/* ── Promo code ── */}
         <div className="w-full mb-4">
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Input
                 placeholder="Promo Code"
                 value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value)}
-                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-white/20 h-9 text-xs"
+                onChange={e => setPromoCode(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleApplyPromo()}
+                className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-white/20 h-9 text-xs"
               />
               {appliedDiscount && (
-                <button 
-                  onClick={() => {
-                    setAppliedDiscount(null);
-                    setPromoSuccess(null);
-                  }}
+                <button
+                  onClick={() => { setAppliedDiscount(null); setPromoSuccess(null); }}
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
                 >
                   <X size={10} />
                 </button>
               )}
             </div>
-            <Button 
+            <Button
               onClick={handleApplyPromo}
               disabled={!promoCode.trim()}
               className="bg-white/10 hover:bg-white/20 text-white border-white/10 px-3 h-9 font-bold text-xs"
@@ -418,12 +386,12 @@ export default function Premium() {
               Apply
             </Button>
           </div>
-          {promoError && <p className="text-red-400 text-[9px] mt-1 text-left ml-1">{promoError}</p>}
-          {promoSuccess && <p className="text-green-400 text-[9px] mt-1 text-left ml-1">{promoSuccess}</p>}
+          {promoError && <p className="text-red-400 text-[10px] mt-1 ml-1">{promoError}</p>}
+          {promoSuccess && <p className="text-green-400 text-[10px] mt-1 ml-1">{promoSuccess}</p>}
         </div>
 
-        {/* Footer Links */}
-        <div className="flex gap-3 text-[10px] text-gray-500 font-medium justify-center">
+        {/* ── Footer links ── */}
+        <div className="flex gap-3 text-[10px] text-gray-600 font-medium justify-center pb-8">
           <button onClick={() => setLocation("/tos")}>Terms</button>
           <span>|</span>
           <button>Privacy</button>
@@ -432,19 +400,16 @@ export default function Premium() {
         </div>
       </div>
 
-      {/* Payment Modal */}
+      {/* ── Payment modal ── */}
       <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
         <DialogContent className="bg-black/90 backdrop-blur-2xl border-white/10 text-white sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Secure Checkout</DialogTitle>
-            <DialogDescription className="text-gray-400">
-              Complete your upgrade to Vaulty+
-            </DialogDescription>
+            <DialogDescription className="text-gray-400">Complete your upgrade to Vaulty+</DialogDescription>
           </DialogHeader>
-          
           <PaymentWrapper
-            price={currentPrice} 
-            billingCycle={billingCycle}
+            price={currentPrice}
+            billingCycle="monthly"
             onSuccess={handlePaymentSuccess}
             onCancel={() => setShowPaymentModal(false)}
           />
