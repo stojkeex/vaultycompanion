@@ -156,7 +156,7 @@ export default function RecentChats() {
             <ChevronLeft size={20} />
           </button>
           <div>
-            <img src={messagesWordmark} alt="Messages" className="h-7 w-auto" />
+            <img src={messagesWordmark} alt="Messages" className="h-14 w-auto" />
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Vaulty Connect</p>
           </div>
         </div>
