@@ -87,16 +87,23 @@ export function BottomNav() {
     return () => unsub();
   }, [user]);
 
-  // Sync active index from location
+  // Sync active index AND bubble position from location
   useEffect(() => {
-    let idx = 0;
+    let idx = -1;
     if (location === "/home") idx = 0;
     else if (location.startsWith("/discover")) idx = 1;
     else if (location.startsWith("/create-companion")) idx = 2;
     else if (location.startsWith("/messages")) idx = 3;
     else if (location.startsWith("/premium")) idx = 4;
-    else return;
+    if (idx === -1) return;
+    // Reset any stuck drag state on navigation
+    setIsDragging(false);
+    setScaleX(1);
+    setScaleY(1);
     setActiveIndex(idx);
+    // Snap bubble after layout settles
+    setTimeout(() => snapToIndex(idx), 50);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
   const getStep = useCallback(() => {
@@ -119,20 +126,6 @@ export function BottomNav() {
     [getStep, navigate]
   );
 
-  // Initial position
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      let idx = 0;
-      if (location === "/home") idx = 0;
-      else if (location.startsWith("/discover")) idx = 1;
-      else if (location.startsWith("/create-companion")) idx = 2;
-      else if (location.startsWith("/messages")) idx = 3;
-      else if (location.startsWith("/premium")) idx = 4;
-      snapToIndex(idx);
-    }, 100);
-    return () => clearTimeout(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Scroll hide/show
   useEffect(() => {
