@@ -150,16 +150,8 @@ export default function RecentChats() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-6 bg-background/50 backdrop-blur-xl sticky top-0 z-50 border-b border-border">
-        <div className="flex items-center gap-2">
-          <button onClick={() => setLocation("/")} className="p-3 bg-card rounded-2xl border border-border hover:border-primary/20 transition-all flex-shrink-0">
-            <ChevronLeft size={20} />
-          </button>
-          <div className="-ml-2">
-            <img src={messagesWordmark} alt="Messages" className="h-20 w-auto -ml-3" />
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Vaulty Connect</p>
-          </div>
-        </div>
+      <div className="flex items-center justify-between px-4 pt-3 pb-1 bg-background/50 backdrop-blur-xl sticky top-0 z-50 border-b border-border">
+        <img src={messagesWordmark} alt="Messages" className="h-20 w-auto -ml-3" />
         <button className="p-3 bg-card rounded-2xl border border-border hover:border-primary/20 transition-all">
           <Edit size={20} />
         </button>
