@@ -1,267 +1,294 @@
-import { Link, useLocation } from "wouter";
-import { Home, MessageSquare, PlusCircle, Search, Zap } from "lucide-react";
-import { useEffect, useState, useMemo } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useLocation } from "wouter";
+import { Home, Search, MessageSquare, Zap } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
-import { motion, AnimatePresence } from "framer-motion";
 import { db } from "@/lib/firebase";
 import { collection, query, onSnapshot, where } from "firebase/firestore";
-import { isSuperAdmin } from "@/lib/admins";
+
+interface TabItem {
+  id: number;
+  href: string;
+  label: string;
+  icon: (isActive: boolean) => React.ReactNode;
+}
+
+const TABS: TabItem[] = [
+  {
+    id: 0,
+    href: "/home",
+    label: "Home",
+    icon: (active) => (
+      <Home
+        className={`w-6 h-6 transition-colors duration-300 ${active ? "text-[#A4FF00]" : "text-white/40"}`}
+        strokeWidth={2.2}
+      />
+    ),
+  },
+  {
+    id: 1,
+    href: "/discover",
+    label: "Search",
+    icon: (active) => (
+      <Search
+        className={`w-6 h-6 transition-colors duration-300 ${active ? "text-[#A4FF00]" : "text-white/40"}`}
+        strokeWidth={2.2}
+      />
+    ),
+  },
+  {
+    id: 2,
+    href: "/create-companion",
+    label: "Create",
+    icon: (active) => (
+      <div
+        className={`p-1.5 rounded-full transition-all duration-300 ${
+          active
+            ? "bg-[#A4FF00] shadow-[0_0_20px_rgba(164,255,0,0.4)]"
+            : "bg-white/10"
+        }`}
+      >
+        <svg
+          className={`w-4 h-4 ${active ? "text-black" : "text-white/40"}`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.4"
+        >
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      </div>
+    ),
+  },
+  {
+    id: 3,
+    href: "/messages",
+    label: "Chat",
+    icon: (active) => (
+      <MessageSquare
+        className={`w-6 h-6 transition-colors duration-300 ${active ? "text-[#A4FF00]" : "text-white/40"}`}
+        strokeWidth={2.2}
+      />
+    ),
+  },
+  {
+    id: 4,
+    href: "/premium",
+    label: "Premium",
+    icon: (active) => (
+      <Zap
+        className={`w-6 h-6 transition-colors duration-300 ${active ? "text-[#A4FF00]" : "text-white/40"}`}
+        strokeWidth={2.2}
+      />
+    ),
+  },
+];
 
 export function BottomNav() {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const { user } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
 
+  // Determine active index from current route
+  const getActiveIndex = useCallback(() => {
+    if (location === "/home") return 0;
+    if (location.startsWith("/discover")) return 1;
+    if (location.startsWith("/create-companion")) return 2;
+    if (location.startsWith("/messages")) return 3;
+    if (location.startsWith("/premium")) return 4;
+    return -1;
+  }, [location]);
+
+  const [activeIndex, setActiveIndex] = useState(() => getActiveIndex());
+  const [bubbleLeft, setBubbleLeft] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [stretch, setStretch] = useState(0);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const bubbleRef = useRef<HTMLDivElement>(null);
+  const dragInfo = useRef({ startX: 0 });
+
+  // Sync activeIndex when route changes
+  useEffect(() => {
+    const idx = getActiveIndex();
+    if (idx >= 0) setActiveIndex(idx);
+  }, [location, getActiveIndex]);
+
+  // Unread messages
   useEffect(() => {
     if (!user) { setUnreadCount(0); return; }
-    const chatsQuery = query(
-      collection(db, "chats"),
-      where("participants", "array-contains", user.uid)
-    );
-    const chatsUnsubscribe = onSnapshot(chatsQuery, (chatsSnapshot) => {
+    const q = query(collection(db, "chats"), where("participants", "array-contains", user.uid));
+    const unsub = onSnapshot(q, (snap) => {
       const chatUnreads: Record<string, number> = {};
-      const unsubscribes = chatsSnapshot.docs.map(chatDoc => {
-        const messagesQuery = query(
-          collection(db, "chats", chatDoc.id, "messages"),
-          where("read", "==", false)
-        );
-        return onSnapshot(messagesQuery, (snap) => {
-          chatUnreads[chatDoc.id] = snap.docs.filter(d => d.data().senderId !== user.uid).length;
+      const innerUnsubs = snap.docs.map((chatDoc) => {
+        const mq = query(collection(db, "chats", chatDoc.id, "messages"), where("read", "==", false));
+        return onSnapshot(mq, (ms) => {
+          chatUnreads[chatDoc.id] = ms.docs.filter((d) => d.data().senderId !== user.uid).length;
           setUnreadCount(Object.values(chatUnreads).reduce((s, c) => s + c, 0));
         });
       });
-      return () => unsubscribes.forEach(u => u());
+      return () => innerUnsubs.forEach((u) => u());
     });
-    return () => chatsUnsubscribe();
+    return () => unsub();
   }, [user]);
 
-  const items = useMemo(() => [
-    { href: "/home",             label: "Home",    icon: Home },
-    { href: "/discover",         label: "Search",  icon: Search },
-    { href: "/create-companion", label: "Create",  icon: PlusCircle },
-    { href: "/messages",         label: "Chat",    icon: MessageSquare },
-    { href: "/premium",          label: "Premium", icon: Zap },
-  ], []);
+  const getLayoutInfo = useCallback(() => {
+    if (!containerRef.current) return { width: 0, step: 0 };
+    const containerWidth = containerRef.current.offsetWidth;
+    const step = (containerWidth - 10) / 5;
+    return { width: containerWidth, step };
+  }, []);
+
+  const updatePosition = useCallback(
+    (index: number) => {
+      const { step } = getLayoutInfo();
+      setBubbleLeft(5 + index * step);
+    },
+    [getLayoutInfo]
+  );
+
+  useEffect(() => {
+    updatePosition(activeIndex >= 0 ? activeIndex : 0);
+    const handleResize = () => updatePosition(activeIndex >= 0 ? activeIndex : 0);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [activeIndex, updatePosition]);
+
+  const handleStart = (e: React.MouseEvent | React.TouchEvent) => {
+    setIsDragging(true);
+    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+    const bubbleRect = bubbleRef.current?.getBoundingClientRect();
+    if (bubbleRect) dragInfo.current.startX = clientX - bubbleRect.left;
+  };
+
+  const handleMove = useCallback(
+    (e: MouseEvent | TouchEvent) => {
+      if (!isDragging || !containerRef.current) return;
+      const clientX = "touches" in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const { step, width } = getLayoutInfo();
+
+      let newLeft = clientX - containerRect.left - dragInfo.current.startX;
+      newLeft = Math.max(5, Math.min(width - step - 5, newLeft));
+
+      const delta = newLeft - bubbleLeft;
+      setStretch(Math.min(Math.abs(delta) * 0.1, 0.18));
+      setBubbleLeft(newLeft);
+
+      const midPoint = newLeft + step / 2;
+      const idx = Math.max(0, Math.min(4, Math.floor(((midPoint - 5) / (width - 10)) * 5)));
+      if (idx !== activeIndex) setActiveIndex(idx);
+    },
+    [isDragging, bubbleLeft, getLayoutInfo, activeIndex]
+  );
+
+  const handleEnd = useCallback(() => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    setStretch(0);
+
+    const { step } = getLayoutInfo();
+    const closestIdx = Math.max(0, Math.min(4, Math.round((bubbleLeft - 5) / step)));
+    setActiveIndex(closestIdx);
+    setBubbleLeft(5 + closestIdx * step);
+    navigate(TABS[closestIdx].href);
+  }, [isDragging, bubbleLeft, getLayoutInfo, navigate]);
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener("mousemove", handleMove);
+      window.addEventListener("mouseup", handleEnd);
+      window.addEventListener("touchmove", handleMove, { passive: false });
+      window.addEventListener("touchend", handleEnd);
+    }
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleEnd);
+      window.removeEventListener("touchmove", handleMove);
+      window.removeEventListener("touchend", handleEnd);
+    };
+  }, [isDragging, handleMove, handleEnd]);
 
   const shouldHide =
     location === "/login" || location === "/register" || location === "/" ||
-    location === "/ai" || location.startsWith("/create-companion") ||
-    location.startsWith("/companion/") || location.startsWith("/messages/") ||
-    location === "/tos" || location.startsWith("/demo-trading/") ||
-    location.startsWith("/chat/private/") || location.startsWith("/course/") ||
-    location.startsWith("/coin/") || location.startsWith("/wallet") ||
-    location.startsWith("/user/") || location === "/create-post" ||
-    location === "/create-listing";
+    location === "/ai" || location.startsWith("/companion/") ||
+    location.startsWith("/messages/") || location === "/tos" ||
+    location.startsWith("/demo-trading/") || location.startsWith("/chat/private/") ||
+    location.startsWith("/course/") || location.startsWith("/coin/") ||
+    location.startsWith("/wallet") || location.startsWith("/user/") ||
+    location === "/create-post" || location === "/create-listing";
 
   if (shouldHide) return null;
 
   return (
-    <motion.div
-      initial={{ y: 30, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50"
-    >
-      {/*
-        Outer dark glass pill — overflow visible so the active
-        circle can poke ~8 px above and below the 64 px bar.
-      */}
+    <div className="fixed bottom-8 left-0 right-0 flex justify-center px-6 pointer-events-none z-50">
       <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          padding: "0 8px",
-          height: 64,
-          borderRadius: 999,
-          overflow: "visible",
-          background: "rgba(22,22,26,0.88)",
-          backdropFilter: "blur(28px)",
-          WebkitBackdropFilter: "blur(28px)",
-          border: "1px solid rgba(255,255,255,0.09)",
-          boxShadow:
-            "0 10px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.07)",
-        }}
+        ref={containerRef}
+        className="relative flex items-center w-full max-w-[500px] h-[72px] p-1.5 bg-zinc-900/60 border border-white/10 rounded-[40px] backdrop-blur-3xl saturate-150 pointer-events-auto select-none overflow-hidden isolate"
       >
-        {items.map((item) => {
-          let isActive = false;
-          if (item.href === "/home")     isActive = location === "/home";
-          else if (item.href === "/messages") isActive = location.startsWith("/messages");
-          else                           isActive = location.startsWith(item.href);
+        {/* Draggable glass bubble */}
+        <div
+          ref={bubbleRef}
+          onMouseDown={handleStart}
+          onTouchStart={handleStart}
+          style={{
+            left: `${bubbleLeft}px`,
+            width: containerRef.current
+              ? (containerRef.current.offsetWidth - 10) / 5
+              : 0,
+            transform: `scale(${1 + stretch}, ${1 - stretch / 2.5})`,
+            transition: isDragging
+              ? "none"
+              : "left 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
+            zIndex: 10,
+          }}
+          className="absolute top-1.5 bottom-1.5 rounded-[34px] cursor-grab active:cursor-grabbing border border-white/20 bg-white/10 backdrop-blur-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_10px_25px_rgba(0,0,0,0.5)] overflow-hidden"
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+          <div className="absolute -top-[50%] left-0 right-0 h-full bg-white/5 blur-xl rounded-full pointer-events-none" />
+        </div>
 
-          return (
-            <Link key={item.href} href={item.href}>
-              <motion.div
-                whileTap={{ scale: 0.88 }}
-                transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                style={{ cursor: "pointer" }}
+        {/* Tab items */}
+        {TABS.map((tab, i) => (
+          <div
+            key={tab.id}
+            onClick={() => {
+              if (!isDragging) {
+                setActiveIndex(i);
+                navigate(tab.href);
+              }
+            }}
+            className="relative z-20 flex flex-col items-center justify-center flex-1 h-full cursor-pointer"
+          >
+            <div
+              style={{
+                transform: activeIndex === i ? "scale(1.1)" : "scale(1)",
+                transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+              }}
+              className="flex flex-col items-center"
+            >
+              <div className="mb-1 h-7 flex items-center justify-center relative">
+                {tab.icon(activeIndex === i)}
+                {/* Unread badge on Chat */}
+                {tab.href === "/messages" && unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[8px] font-bold rounded-full min-w-[14px] h-[14px] flex items-center justify-center px-0.5 shadow-md z-30">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </div>
+              <span
+                className={`text-[10px] tracking-tight transition-colors duration-500 ${
+                  activeIndex === i
+                    ? "text-[#A4FF00] font-bold"
+                    : "text-white/40 font-medium"
+                }`}
               >
-                <AnimatePresence mode="wait">
-                  {isActive ? (
-                    /* ─────────────────────────────────────────────
-                       ACTIVE — circle taller than the pill (80 px)
-                       so it extends ±8 px beyond the 64 px bar.
-                    ───────────────────────────────────────────── */
-                    <motion.div
-                      key="active"
-                      layoutId="nav-bubble"
-                      initial={{ scale: 0.7, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0.7, opacity: 0 }}
-                      transition={{ type: "spring", stiffness: 360, damping: 28 }}
-                      style={{
-                        width: 80,
-                        height: 80,
-                        borderRadius: "50%",
-                        /* Iridescent ring — dark oil-slick colours, green glow at top */
-                        padding: 4,
-                        background:
-                          "conic-gradient(from 270deg, #55ff0a 0deg, #22aa30 40deg, #003320 80deg, #001510 120deg, #000008 160deg, #08000a 200deg, #180000 230deg, #050000 260deg, #001210 290deg, #00380a 330deg, #55ff0a 360deg)",
-                        boxShadow:
-                          "0 0 22px rgba(85,255,10,0.35), 0 6px 24px rgba(0,0,0,0.6)",
-                      }}
-                    >
-                      {/* Inner glass circle — dark frosted */}
-                      <div
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          borderRadius: "50%",
-                          background: "rgba(28,30,28,0.92)",
-                          backdropFilter: "blur(12px)",
-                          WebkitBackdropFilter: "blur(12px)",
-                          border: "1px solid rgba(255,255,255,0.08)",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: 4,
-                        }}
-                      >
-                        {/* Lime green icon circle */}
-                        <div
-                          style={{
-                            width: 38,
-                            height: 38,
-                            borderRadius: "50%",
-                            background:
-                              "radial-gradient(circle at 35% 30%, #d4ff55, #88dd00)",
-                            boxShadow:
-                              "0 2px 10px rgba(136,221,0,0.5), inset 0 1px 0 rgba(255,255,255,0.4)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexShrink: 0,
-                          }}
-                        >
-                          <item.icon
-                            style={{
-                              width: 18,
-                              height: 18,
-                              color: "#0d1800",
-                              strokeWidth: 2.4,
-                            }}
-                          />
-                        </div>
-
-                        {/* Label */}
-                        <span
-                          style={{
-                            fontSize: 9,
-                            fontWeight: 700,
-                            letterSpacing: "0.04em",
-                            color: "#aaff22",
-                            lineHeight: 1,
-                            textShadow: "0 0 8px rgba(170,255,34,0.7)",
-                          }}
-                        >
-                          {item.label}
-                        </span>
-                      </div>
-                    </motion.div>
-                  ) : (
-                    /* ─────────────────────────────────────────────
-                       INACTIVE — glass capsule, fits inside 64 px bar
-                    ───────────────────────────────────────────── */
-                    <motion.div
-                      key="inactive"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.15 }}
-                      style={{
-                        width: 68,
-                        height: 56,
-                        borderRadius: 28,
-                        /* Glass capsule */
-                        background: "rgba(50,52,56,0.60)",
-                        backdropFilter: "blur(14px)",
-                        WebkitBackdropFilter: "blur(14px)",
-                        border: "1px solid rgba(255,255,255,0.10)",
-                        boxShadow:
-                          "inset 0 1px 0 rgba(255,255,255,0.14), 0 2px 8px rgba(0,0,0,0.3)",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: 5,
-                        position: "relative",
-                      }}
-                    >
-                      <item.icon
-                        style={{
-                          width: 20,
-                          height: 20,
-                          color: "rgba(255,255,255,0.82)",
-                          strokeWidth: 1.9,
-                        }}
-                      />
-                      <span
-                        style={{
-                          fontSize: 10,
-                          fontWeight: 600,
-                          color: "rgba(255,255,255,0.75)",
-                          letterSpacing: "0.02em",
-                          lineHeight: 1,
-                        }}
-                      >
-                        {item.label}
-                      </span>
-
-                      {/* Unread badge */}
-                      {item.href === "/messages" && unreadCount > 0 && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          style={{
-                            position: "absolute",
-                            top: 6,
-                            right: 8,
-                            background: "#ef4444",
-                            color: "#fff",
-                            fontSize: 8,
-                            fontWeight: 700,
-                            borderRadius: 99,
-                            minWidth: 16,
-                            height: 16,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            padding: "0 3px",
-                            boxShadow: "0 2px 6px rgba(0,0,0,0.4)",
-                          }}
-                        >
-                          {unreadCount > 99 ? "99+" : unreadCount}
-                        </motion.div>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            </Link>
-          );
-        })}
+                {tab.label}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
-    </motion.div>
+    </div>
   );
 }
