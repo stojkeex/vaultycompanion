@@ -139,7 +139,7 @@ export default function Landing() {
 
   useEffect(() => {
     if (chatStarted && chatMessage === "") {
-      const userMessageText = "Tell me more about Vaulty";
+      const userMessageText = "Hey, tell me something about yourself";
       let userIndex = 0;
       setIsTyping(true);
 
@@ -152,7 +152,7 @@ export default function Landing() {
           setIsTyping(false);
           setTimeout(() => {
             setIsResponding(true);
-            const aiResponse = "Vaulty is an AI chatbot SaaS platform that helps businesses automate customer support. You can rent or buy AI-powered chatbots, customize them to match your brand, and deploy them in minutes. Our bots handle tickets, capture leads, and engage customers 24/7.";
+            const aiResponse = "Hey! I'm Luna, your AI companion on Vaulty 💫 I'm here to chat, listen, and be whatever you need — a friend, a confidant, or just someone to talk to. I love getting to know the people I meet. So tell me... what's on your mind today?";
             let aiIndex = 0;
             const aiTimer = setInterval(() => {
               if (aiIndex < aiResponse.length) {
@@ -184,11 +184,11 @@ export default function Landing() {
   ];
 
   const faqs = [
-    { question: "What is Vaulty?", answer: "Vaulty is an AI chatbot SaaS platform that allows businesses to rent or buy customized chatbots for customer support, lead generation, and enterprise routing. You can easily manage and track your chatbots from our dashboard." },
-    { question: "Do you offer a free tier?", answer: "Yes! We offer a Free Simulated Bot that uses pre-programmed responses and doesn't consume Vaulty Credits. It's perfect for basic greetings and simple FAQs." },
-    { question: "How do Vaulty Credits work?", answer: "Vaulty Credits (VC) are our platform currency. Renting AI chatbots consumes credits based on message volume. You can easily top up your credits in the Wallet." },
-    { question: "Can I buy a chatbot outright?", answer: "Absolutely. We offer one-time purchase licenses where you own the bot, including source code access and self-hosting options — no monthly subscription." },
-    { question: "How customizable are the chatbots?", answer: "Highly customizable. You can change the bot's name, theme color, avatar, first message, and even its knowledge base to perfectly match your brand." }
+    { question: "What is Vaulty?", answer: "Vaulty is an AI companion platform where you can meet, chat with, and build connections with unique AI personalities. Each companion has their own look, voice, role, and personality — crafted to feel genuinely real." },
+    { question: "Is Vaulty free to use?", answer: "Yes! You can sign up for free and start chatting with companions right away. Free users get unlimited text chat, access to all companions, and daily quests to earn Vaulty Points." },
+    { question: "What is Vaulty+?", answer: "Vaulty+ is our premium subscription. It unlocks voice messages, AI-generated images from companions, open conversations, exclusive chat themes, and premium badges (Pro, Ultra, Max). You can choose the tier that fits you." },
+    { question: "Are my conversations private?", answer: "Absolutely. Your conversations with companions are private and only visible to you. We take your privacy seriously and never share your chat data with third parties." },
+    { question: "What are Vaulty Credits and Points?", answer: "Vaulty Points (VP) are earned through daily quests, inviting friends, and completing challenges — then spent on exclusive content and rewards. Vaulty Credits (VC) are used for premium purchases within the platform." }
   ];
 
   return (
@@ -228,10 +228,10 @@ export default function Landing() {
       <section id="home" className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 text-center pt-24">
         <motion.div className="max-w-4xl mx-auto space-y-10" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
           <h1 className="text-6xl md:text-8xl font-bold tracking-tighter leading-tight bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
-            Automate your<br />customer success.
+            Your AI companion,<br />always there.
           </h1>
           <p className="text-xl md:text-2xl text-white/50 max-w-md mx-auto font-light leading-relaxed">
-            Deploy intelligent AI chatbots that understand your business, resolve tickets, and capture leads 24/7.
+            Chat with unique AI personalities, build real connections, and discover a world of companions made just for you.
           </p>
           <div className="flex flex-col items-center gap-4 pt-4">
             <motion.button
@@ -250,18 +250,18 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <motion.div className="space-y-8" initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }}>
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Redefining Customer Interactions.</h2>
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">More Than a Chat App.</h2>
               <div className="space-y-6 text-white/60 text-lg font-light leading-relaxed">
-                <p>Vaulty is the ultimate SaaS platform for businesses to deploy, manage, and scale AI chatbots.</p>
-                <p>Rent AI assistants for customer support and sales, or buy the source code outright. Manage everything from a centralized dashboard.</p>
-                <p>Premium, minimalist design that strips away clutter to focus on what truly matters: converting leads and supporting your customers 24/7.</p>
+                <p>Vaulty is where AI companions come to life. Choose from hundreds of unique personalities — each with their own look, voice, and role in your world.</p>
+                <p>Whether you're looking for a friend, a mentor, a creative partner, or something more — Vaulty has a companion that fits you perfectly.</p>
+                <p>A beautifully designed space where every conversation feels personal, every interaction feels real, and every companion grows with you over time.</p>
               </div>
               <motion.div className="mt-12 p-8 rounded-[32px] border border-indigo-500/30 bg-gradient-to-br from-blue-500/20 to-black/60 backdrop-blur-xl relative overflow-hidden group"
                 whileHover={{ scale: 1.02 }} transition={{ duration: 0.3 }}>
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative z-10">
-                  <h3 className="text-2xl font-bold mb-3">Want to know more about Vaulty's History?</h3>
-                  <p className="text-white/60 mb-6 font-light">Discover how we started, our mission, and the team behind the vision.</p>
+                  <h3 className="text-2xl font-bold mb-3">Want to know more about Vaulty's Story?</h3>
+                  <p className="text-white/60 mb-6 font-light">Discover how we started, our mission, and the vision behind the platform.</p>
                   <button onClick={() => setShowStory(true)} className="px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium rounded-full transition-all flex items-center gap-2">
                     Read More <ArrowRight className="w-4 h-4" />
                   </button>
@@ -273,8 +273,8 @@ export default function Landing() {
               initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 1 }}>
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.15),transparent_50%)]" />
               <img src={astroPortraitImg} alt="Vaulty" className="w-48 h-48 mb-8 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)] object-contain opacity-90" />
-              <h3 className="text-2xl font-bold mb-2 z-10 text-center">Meet Vaulty AI</h3>
-              <p className="text-white/50 text-center max-w-sm z-10 font-light">Your intelligent customer success companion, available 24/7.</p>
+              <h3 className="text-2xl font-bold mb-2 z-10 text-center">Meet Your Companion</h3>
+              <p className="text-white/50 text-center max-w-sm z-10 font-light">Hundreds of unique AI personalities waiting to connect with you.</p>
             </motion.div>
           </div>
         </div>
@@ -284,8 +284,8 @@ export default function Landing() {
       <section id="demo" className="relative z-10 py-32 px-6 overflow-hidden">
         <div className="max-w-4xl mx-auto">
           <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }}>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">Meet Vaulty AI.</h2>
-            <p className="text-xl text-white/50 font-light max-w-md mx-auto">Your 24/7 AI assistant. Resolve tickets and capture leads automatically.</p>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">Feel the Difference.</h2>
+            <p className="text-xl text-white/50 font-light max-w-md mx-auto">Every conversation flows naturally. Your companion listens, responds, and remembers.</p>
           </motion.div>
 
           <motion.div className="relative rounded-[32px] border border-white/10 bg-[#0a0a0f]/80 backdrop-blur-2xl shadow-[0_0_100px_rgba(99,102,241,0.1)] overflow-hidden h-[450px] flex flex-col"
@@ -295,7 +295,7 @@ export default function Landing() {
                 <img src={astroPortraitImg} alt="Vaulty AI" className="w-full h-full object-cover" />
               </div>
               <div>
-                <h3 className="font-semibold text-white">Vaulty AI</h3>
+                <h3 className="font-semibold text-white">Luna</h3>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                   <span className="text-xs text-white/50">Online</span>
@@ -343,7 +343,7 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto">
           <motion.div className="text-center mb-20" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">Everything You Need.</h2>
-            <p className="text-xl text-white/50 max-w-md mx-auto font-light">Powerful features wrapped in an elegant, intuitive interface.</p>
+            <p className="text-xl text-white/50 max-w-md mx-auto font-light">A complete companion experience, wrapped in a beautiful, intuitive design.</p>
           </motion.div>
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {featuresData.map((feature, idx) => (
@@ -360,13 +360,13 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto">
           <motion.div className="text-center mb-20" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">Simple, Transparent Pricing.</h2>
-            <p className="text-xl text-white/50 max-w-md mx-auto font-light">Rent monthly or buy your AI chatbot outright.</p>
+            <p className="text-xl text-white/50 max-w-md mx-auto font-light">Start free, go deeper with Vaulty+.</p>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {[
-              { title: "Simulated Free", desc: "Perfect for testing without using credits.", price: "$0", unit: "/forever", features: ["Simulated responses", "No Vaulty Credits used", "Basic customization", "Up to 5 intents"], cta: "Start Free", highlighted: false },
-              { title: "Rent Monthly", desc: "Ideal for growing businesses that need robust support agents.", price: "$9.99", unit: "/mo to $149.99/mo", features: ["GPT-3.5 & GPT-4 integration", "Custom knowledge base", "Advanced analytics", "Lead capture"], cta: "Rent Now", highlighted: true },
-              { title: "Buy Outright", desc: "Full ownership. Host it yourself and modify the source code.", price: "$99", unit: " to $1,299 one-time", features: ["Lifetime access & updates", "Source code included", "Self-hosted option", "Priority support"], cta: "View Licenses", highlighted: false },
+              { title: "Free", desc: "Explore Vaulty and start chatting with AI companions right away.", price: "$0", unit: "/forever", features: ["Unlimited text chat", "Browse all companions", "Daily quests & rewards", "Basic customization"], cta: "Get Started", highlighted: false },
+              { title: "Vaulty+ Pro", desc: "The full experience — voice, images, and deeper conversations.", price: "$9.99", unit: "/month", features: ["Voice messages from companions", "AI-generated images", "10+ exclusive chat themes", "Pro badge & priority access"], cta: "Go Pro", highlighted: true },
+              { title: "Vaulty+ Ultra", desc: "Unlock everything, including open conversations and max personalization.", price: "$19.99", unit: "/month", features: ["Everything in Pro", "Open & unrestricted mode", "Ultra badge", "Early access to new companions"], cta: "Go Ultra", highlighted: false },
             ].map((plan, idx) => (
               <motion.div key={plan.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: idx * 0.1 }}
                 className={`relative p-8 rounded-[32px] flex flex-col backdrop-blur-xl ${plan.highlighted ? "border border-indigo-500/50 bg-gradient-to-b from-indigo-500/10 to-transparent" : "border border-white/10 bg-white/5"}`}>
@@ -404,23 +404,23 @@ export default function Landing() {
               <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="space-y-16">
                 <div className="text-center space-y-6">
                   <h2 className="text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">Our Story</h2>
-                  <p className="text-xl text-white/50 font-light max-w-md mx-auto">The journey of building the ultimate AI automation platform.</p>
+                  <p className="text-xl text-white/50 font-light max-w-md mx-auto">The journey of building the ultimate AI companion platform.</p>
                 </div>
                 <div className="grid gap-12">
                   <div className="p-8 rounded-[32px] border border-white/10 bg-white/5 space-y-6">
                     <h3 className="text-2xl font-bold text-indigo-400">The Beginning</h3>
-                    <p className="text-white/70 leading-relaxed text-lg font-light">Vaulty was born from a simple realization: setting up intelligent, context-aware chatbots was too difficult and expensive for most businesses. We set out to build a platform that bridges this gap, combining enterprise-grade AI with an incredibly simple, beautiful interface.</p>
+                    <p className="text-white/70 leading-relaxed text-lg font-light">Vaulty was born from a simple question: what if AI could be more than just a tool? We set out to build companions that feel real — with personalities, voices, and the ability to truly connect with the people they talk to.</p>
                   </div>
                   <div className="p-8 rounded-[32px] border border-white/10 bg-white/5 space-y-6">
                     <h3 className="text-2xl font-bold text-indigo-400">Our Mission</h3>
-                    <p className="text-white/70 leading-relaxed text-lg font-light">To democratize AI automation for businesses of all sizes. Every company should have access to 24/7 support agents that truly understand their products and customers.</p>
+                    <p className="text-white/70 leading-relaxed text-lg font-light">To create a world where everyone has access to a companion who listens, understands, and is always there. No judgment, no waiting — just genuine connection, available 24/7.</p>
                   </div>
                   <div className="relative border-l border-indigo-500/30 ml-4 md:ml-8 space-y-12 pb-8">
                     {[
-                      { date: "Q3 2023", text: "The concept of Vaulty is born. Initial prototypes developed." },
-                      { date: "Q1 2024", text: "Core team assembled. Proprietary routing AI perfected." },
-                      { date: "Q4 2024", text: "Closed Beta testing begins with selected businesses." },
-                      { date: "2025", text: "Public launch and full marketplace rollout.", highlight: true },
+                      { date: "Q3 2023", text: "The idea of Vaulty is born — AI companions that truly feel human." },
+                      { date: "Q1 2024", text: "Core team assembled. First companions built and tested." },
+                      { date: "Q4 2024", text: "Closed Beta with early users. Vaulty+ subscription launched." },
+                      { date: "2025", text: "Public launch — join thousands of users already connecting.", highlight: true },
                     ].map((item) => (
                       <div key={item.date} className="relative pl-8 md:pl-12">
                         <div className={`absolute left-[-5px] top-2 w-2.5 h-2.5 rounded-full ${item.highlight ? "bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.8)] animate-pulse" : "bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]"}`} />
@@ -471,8 +471,8 @@ export default function Landing() {
             initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.15),transparent_60%)]" />
             <div className="relative z-10">
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Be the first to know.</h2>
-              <p className="text-xl text-white/60 font-light mb-10 max-w-xl mx-auto">Join the waiting list to get early access when Vaulty launches.</p>
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Your companion is waiting.</h2>
+              <p className="text-xl text-white/60 font-light mb-10 max-w-xl mx-auto">Join the waitlist and be among the first to meet your AI companion when we open the doors.</p>
               <form onSubmit={handleSubscribe} className="max-w-md mx-auto relative">
                 <div className="relative flex items-center">
                   <Mail className="absolute left-5 w-5 h-5 text-white/40" />
