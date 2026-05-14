@@ -27,27 +27,47 @@ const TABS: TabItem[] = [
 
 function NavIcon({ src, active }: { src: string; active: boolean }) {
   return (
-    <div
-      style={{
-        width: 28,
-        height: 28,
-        maskImage: `url(${src})`,
-        WebkitMaskImage: `url(${src})`,
-        maskSize: "contain",
-        WebkitMaskSize: "contain",
-        maskRepeat: "no-repeat",
-        WebkitMaskRepeat: "no-repeat",
-        maskPosition: "center",
-        WebkitMaskPosition: "center",
-        maskMode: "luminance",
-        WebkitMaskMode: "luminance",
-        background: active
-          ? "linear-gradient(135deg, #4477FF 0%, #8833FF 50%, #FF33EE 100%)"
-          : "white",
-        opacity: active ? 1 : 0.45,
-        transition: "background 0.3s ease, opacity 0.3s ease",
-      }}
-    />
+    <div style={{ width: 28, height: 28, position: "relative" }}>
+      {/* Gradient layer (active) */}
+      {active && (
+        <div
+          style={{
+            position: "absolute", inset: 0,
+            maskImage: `url(${src})`,
+            WebkitMaskImage: `url(${src})`,
+            maskSize: "contain",
+            WebkitMaskSize: "contain",
+            maskRepeat: "no-repeat",
+            WebkitMaskRepeat: "no-repeat",
+            maskPosition: "center",
+            WebkitMaskPosition: "center",
+            maskMode: "luminance",
+            WebkitMaskMode: "luminance",
+            background: "linear-gradient(135deg, #55AAFF 0%, #9933FF 45%, #FF22EE 100%)",
+          }}
+        />
+      )}
+      {/* White layer (inactive) */}
+      {!active && (
+        <div
+          style={{
+            position: "absolute", inset: 0,
+            maskImage: `url(${src})`,
+            WebkitMaskImage: `url(${src})`,
+            maskSize: "contain",
+            WebkitMaskSize: "contain",
+            maskRepeat: "no-repeat",
+            WebkitMaskRepeat: "no-repeat",
+            maskPosition: "center",
+            WebkitMaskPosition: "center",
+            maskMode: "luminance",
+            WebkitMaskMode: "luminance",
+            background: "white",
+            opacity: 0.55,
+          }}
+        />
+      )}
+    </div>
   );
 }
 
