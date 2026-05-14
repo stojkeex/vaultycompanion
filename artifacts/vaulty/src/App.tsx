@@ -77,6 +77,10 @@ function Router() {
         {/* Support old route but redirect to home */}
         <Route path="/home/:tab" component={() => <Redirect to="/home" />} />
 
+        <Route path="/discover" component={() => <ProtectedRoute component={Home} />} />
+        <Route path="/messages" component={() => <ProtectedRoute component={RecentChats} />} />
+        <Route path="/recent-chats" component={() => <ProtectedRoute component={RecentChats} />} />
+
         <Route path="/news" component={() => <ProtectedRoute component={NewsPage} />} />
         <Route path="/news/:slug" component={() => <ProtectedRoute component={NewsDetail} />} />
         

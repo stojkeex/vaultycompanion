@@ -300,8 +300,9 @@ export function BottomNav() {
     };
   }, [isDragging, onMove, onEnd]);
 
-  // Only show on home page
-  if (location !== "/home") return null;
+  // Show on main nav pages only
+  const mainPages = ["/home", "/discover", "/create-companion", "/messages", "/premium"];
+  if (!mainPages.some(p => location === p || location.startsWith(p + "?"))) return null;
 
   return (
     <>
