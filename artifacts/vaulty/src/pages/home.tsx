@@ -198,19 +198,19 @@ export default function Home() {
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans selection:bg-white/10 overflow-x-hidden pb-32">
+    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans selection:bg-white/10 overflow-x-hidden pb-32 md:pl-[280px] md:pb-0">
       <FloatingAdminButton onClick={() => setIsAdminPanelOpen(true)} />
       
-      {/* Sidebar Trigger */}
+      {/* Sidebar Trigger - mobile only */}
       <button 
         onClick={() => setSidebarOpen(true)}
-        className="fixed left-0 top-1/2 -translate-y-1/2 z-40 bg-white/5 backdrop-blur-md border border-white/10 border-l-0 rounded-r-2xl p-3 hover:bg-white/10 transition-all active:scale-95 shadow-2xl"
+        className="md:hidden fixed left-0 top-1/2 -translate-y-1/2 z-40 bg-white/5 backdrop-blur-md border border-white/10 border-l-0 rounded-r-2xl p-3 hover:bg-white/10 transition-all active:scale-95 shadow-2xl"
       >
         <ChevronRight className="w-5 h-5 text-white/50" />
       </button>
 
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/5">
+      <header className="fixed top-0 left-0 right-0 z-50 md:left-[280px] bg-black/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <img src={vaultyWordmark} alt="Vaulty" className="h-6 w-auto" />
           <div className="flex items-center gap-2">
@@ -495,23 +495,83 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Sidebar Navigation */}
+      {/* Desktop Sidebar - always visible on md+ */}
+      <div className="hidden md:flex fixed left-0 top-0 bottom-0 w-[280px] bg-[#0A0A0A] border-r border-white/5 z-[40] flex-col shadow-2xl">
+        <div className="p-8 border-b border-white/5">
+          <div className="mb-8">
+            <img src={vaultyWordmark} alt="Vaulty" className="h-6 w-auto" />
+          </div>
+          <Link href="/profile">
+            <div className="flex items-center gap-4 group cursor-pointer">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-zinc-800 to-black border border-white/10 flex items-center justify-center text-zinc-500 group-hover:text-white transition-all overflow-hidden">
+                {userData?.avatar ? <img src={userData.avatar} className="w-full h-full object-cover" /> : <User size={24} />}
+              </div>
+              <div>
+                <p className="font-bold text-sm tracking-tight">{userData?.username || user?.email?.split('@')[0]}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 group-hover:text-pink-500 transition-colors">View Profile</p>
+              </div>
+            </div>
+          </Link>
+        </div>
+
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          {[
+            { icon: HomeIcon, label: "Home", href: "/home" },
+            { icon: Compass, label: "Discovery", href: "/home" },
+            { icon: PlaySquare, label: "Live", href: "/live" },
+            { icon: Zap, label: "Premium", href: "/premium", highlight: true },
+            { icon: Newspaper, label: "News", onClick: () => setIsNewsPanelOpen(true) },
+            { icon: History, label: "History", href: "/recent-chats" },
+            { icon: Settings, label: "Settings", href: "/settings" },
+          ].map((item, idx) => (
+            <button
+              key={idx}
+              onClick={() => {
+                if (item.onClick) item.onClick();
+                else if (item.href) setLocation(item.href);
+              }}
+              className={cn(
+                "w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all group",
+                item.highlight ? "bg-pink-500/10 text-pink-500 hover:bg-pink-500/20" : "hover:bg-white/5 text-zinc-400 hover:text-white"
+              )}
+            >
+              <item.icon size={20} strokeWidth={2.5} className={cn("transition-transform group-hover:scale-110", item.highlight ? "fill-pink-500/20" : "")} />
+              <span className="font-bold text-sm">{item.label}</span>
+            </button>
+          ))}
+        </nav>
+
+        <div className="p-8 border-t border-white/5 bg-white/[0.02]">
+          <button
+            onClick={() => {
+              const { auth } = require("@/lib/firebase");
+              auth.signOut();
+              setLocation("/login");
+            }}
+            className="w-full flex items-center gap-4 text-zinc-500 hover:text-white transition-all group font-bold text-sm"
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Sidebar - drawer (hidden on desktop) */}
       <AnimatePresence>
         {sidebarOpen && (
           <>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSidebarOpen(false)}
-              className="fixed inset-0 bg-black/80 backdrop-blur-md z-[140]"
+              className="fixed inset-0 bg-black/80 backdrop-blur-md z-[140] md:hidden"
             />
-            <motion.div 
+            <motion.div
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed left-0 top-0 bottom-0 w-[80%] max-w-[320px] bg-[#0A0A0A] border-r border-white/5 z-[150] flex flex-col shadow-2xl"
+              className="fixed left-0 top-0 bottom-0 w-[80%] max-w-[320px] bg-[#0A0A0A] border-r border-white/5 z-[150] flex flex-col shadow-2xl md:hidden"
             >
               <div className="p-8 border-b border-white/5">
                 <div className="flex items-center justify-between mb-8">
@@ -562,7 +622,7 @@ export default function Home() {
               </nav>
 
               <div className="p-8 border-t border-white/5 bg-white/[0.02]">
-                <button 
+                <button
                   onClick={() => {
                     const { auth } = require("@/lib/firebase");
                     auth.signOut();

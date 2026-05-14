@@ -347,7 +347,7 @@ export function BottomNav() {
 
       {/* Bottom bar */}
       <div
-        className={`fixed left-0 right-0 flex justify-center px-4 z-50 pointer-events-none select-none transition-all duration-700 ${
+        className={`md:hidden fixed left-0 right-0 flex justify-center px-4 z-50 pointer-events-none select-none transition-all duration-700 ${
           scrollVisible ? "bottom-10 opacity-100 translate-y-0" : "bottom-0 opacity-0 translate-y-24"
         }`}
       >
