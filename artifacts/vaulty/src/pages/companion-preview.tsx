@@ -82,134 +82,142 @@ export default function CompanionPreview() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans pb-32 overflow-x-hidden">
+    <div className="min-h-screen bg-black text-white font-sans overflow-x-hidden">
+
       {/* Top Header Overlay */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-6">
-        <Link href="/home">
-          <button className="p-3 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full active:scale-90 transition-all">
-            <ChevronLeft size={24} />
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 pt-14 pb-4">
+        <button
+          onClick={() => setLocation("/discover")}
+          className="w-11 h-11 flex items-center justify-center bg-white/10 backdrop-blur-2xl border border-white/15 rounded-full active:scale-90 transition-all shadow-lg"
+        >
+          <ChevronLeft size={22} strokeWidth={2.5} />
+        </button>
+        <div className="flex gap-2.5">
+          <button className="w-11 h-11 flex items-center justify-center bg-white/10 backdrop-blur-2xl border border-white/15 rounded-full active:scale-90 transition-all shadow-lg">
+            <Share2 size={18} strokeWidth={2} />
           </button>
-        </Link>
-        <div className="flex gap-3">
-          <button className="p-3 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full active:scale-90 transition-all">
-            <Share2 size={20} />
-          </button>
-          <button className="p-3 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full active:scale-90 transition-all">
-            <Heart size={20} />
+          <button className="w-11 h-11 flex items-center justify-center bg-white/10 backdrop-blur-2xl border border-white/15 rounded-full active:scale-90 transition-all shadow-lg">
+            <Heart size={18} strokeWidth={2} />
           </button>
         </div>
       </div>
 
-      {/* Media Carousel Area */}
-      <div className="relative w-full aspect-[4/5] bg-black">
-        {/* Background Layer: Image (Shows immediately) */}
-        <img 
-          src={displayPhoto} 
-          alt={companion.name} 
-          className="absolute inset-0 w-full h-full object-cover z-0" 
+      {/* Media Carousel */}
+      <div className="relative w-full aspect-[3/4] bg-black">
+        <img
+          src={displayPhoto}
+          alt={companion.name}
+          className="absolute inset-0 w-full h-full object-cover z-0"
         />
-
         <div className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar w-full h-full relative z-10">
-          {/* Video Preview (First) */}
           {companion.videoURL && (
-            <div className="snap-center shrink-0 w-full h-full bg-transparent relative">
-              <video 
+            <div className="snap-center shrink-0 w-full h-full">
+              <video
                 src={companion.videoURL}
                 className="w-full h-full object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="auto"
+                autoPlay muted loop playsInline preload="auto"
               />
             </div>
           )}
-          
-          {/* Main Photo (Second - if video exists, otherwise first) */}
           <div className="snap-center shrink-0 w-full h-full">
             <img src={displayPhoto} alt={companion.name} className="w-full h-full object-cover" />
           </div>
-
-          {/* Extra Images */}
           {companion.extraImages?.map((img: string, idx: number) => (
             <div key={idx} className="snap-center shrink-0 w-full h-full">
-              <img src={img} alt={`${companion.name} extra ${idx}`} className="w-full h-full object-cover" />
+              <img src={img} alt="" className="w-full h-full object-cover" />
             </div>
           ))}
         </div>
 
-        {/* Swipe indicator dots */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 p-2 bg-black/20 backdrop-blur-md rounded-full">
-          <div className="w-1.5 h-1.5 rounded-full bg-pink-500" />
+        {/* Dots */}
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-1.5 px-3 py-1.5 bg-black/30 backdrop-blur-xl rounded-full border border-white/10">
+          <div className="w-1.5 h-1.5 rounded-full bg-white" />
           <div className="w-1.5 h-1.5 rounded-full bg-white/30" />
           {companion.extraImages?.map((_: any, idx: number) => (
             <div key={idx} className="w-1.5 h-1.5 rounded-full bg-white/30" />
           ))}
         </div>
+
+        {/* Bottom gradient fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent z-10 pointer-events-none" />
       </div>
 
-      {/* Character Content */}
-      <div className="px-6 py-8 space-y-8 max-w-2xl mx-auto">
-        {/* Name & Basic Info */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between gap-4">
-            <h1 className="text-4xl font-black italic uppercase tracking-tighter font-serif leading-none truncate">{companion.name}, {companion.age}</h1>
-            <Button 
+      {/* Glass Card — character info */}
+      <div className="relative -mt-6 z-20 mx-3 rounded-[28px] bg-white/[0.04] border border-white/10 backdrop-blur-2xl shadow-[0_0_60px_rgba(0,0,0,0.6)] overflow-hidden">
+
+        {/* Subtle gradient top edge */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+        <div className="px-6 pt-6 pb-8 space-y-6">
+
+          {/* Name + Message button */}
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-[32px] font-bold tracking-tight leading-none">{companion.name}</h1>
+              <p className="text-zinc-400 text-base font-medium mt-1">{companion.age} years old</p>
+            </div>
+            <button
               onClick={handleMessageClick}
-              className="h-12 px-6 bg-pink-500 hover:bg-pink-600 text-white rounded-2xl shadow-lg shadow-pink-500/20 flex items-center gap-2 text-sm font-black italic uppercase tracking-widest transform active:scale-95 transition-all shrink-0"
+              className="flex items-center gap-2 px-5 h-12 rounded-2xl text-sm font-semibold tracking-wide text-white active:scale-95 transition-all shrink-0 shadow-[0_0_30px_rgba(100,80,255,0.35)]"
+              style={{ background: "linear-gradient(135deg, #4477FF, #8833FF, #CC33FF)" }}
             >
-              <MessageSquare size={18} strokeWidth={3} className="fill-white" />
+              <MessageSquare size={16} strokeWidth={2} />
               Message
-            </Button>
+            </button>
           </div>
-          <div className="flex flex-wrap gap-2 pt-2">
+
+          {/* Tags */}
+          <div className="flex flex-wrap gap-2">
             {companion.nationality && (
-              <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">
-                <Globe size={14} className="text-zinc-500" />
-                <span className="text-xs font-bold">{companion.nationality}</span>
+              <div className="flex items-center gap-1.5 bg-white/6 border border-white/10 px-3.5 py-2 rounded-full backdrop-blur-md">
+                <Globe size={13} className="text-zinc-400" strokeWidth={2} />
+                <span className="text-[13px] font-medium text-zinc-200">{companion.nationality}</span>
               </div>
             )}
             {companion.personality && (
-              <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">
-                <Heart size={14} className="text-pink-500" />
-                <span className="text-xs font-bold text-pink-500">{companion.personality}</span>
+              <div className="flex items-center gap-1.5 bg-white/6 border border-white/10 px-3.5 py-2 rounded-full backdrop-blur-md">
+                <Zap size={13} className="text-zinc-400" strokeWidth={2} />
+                <span className="text-[13px] font-medium text-zinc-200">{companion.personality}</span>
               </div>
             )}
-            <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">
-              <Shield size={14} className="text-cyan-500" />
-              <span className="text-xs font-bold">Verified AI</span>
+            <div className="flex items-center gap-1.5 bg-white/6 border border-white/10 px-3.5 py-2 rounded-full backdrop-blur-md">
+              <Shield size={13} className="text-zinc-400" strokeWidth={2} />
+              <span className="text-[13px] font-medium text-zinc-200">Verified AI</span>
             </div>
           </div>
-        </div>
 
-        {/* Bio/About Me */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-zinc-500 uppercase font-black text-[10px] tracking-[0.2em]">
-            <Info size={14} />
-            About Me
+          {/* Divider */}
+          <div className="h-px bg-white/8" />
+
+          {/* Bio */}
+          <div className="space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">About</p>
+            <p className="text-[15px] text-zinc-200 leading-[1.7] font-normal">
+              {displayBio}
+            </p>
           </div>
-          <p className="text-zinc-300 text-lg leading-relaxed font-medium">
-            {displayBio}
-          </p>
-        </div>
 
-        {/* Interests (Tags) */}
-        {companion.interests && (
-          <div className="space-y-3">
-            <div className="text-zinc-500 uppercase font-black text-[10px] tracking-[0.2em]">Interests</div>
-            <div className="flex flex-wrap gap-2">
-              {companion.interests.map((interest: string) => (
-                <span key={interest} className="px-4 py-2 bg-zinc-900 border border-white/5 rounded-2xl text-sm font-bold text-zinc-400">
-                  #{interest}
-                </span>
-              ))}
+          {/* Interests */}
+          {companion.interests && companion.interests.length > 0 && (
+            <div className="space-y-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Interests</p>
+              <div className="flex flex-wrap gap-2">
+                {companion.interests.map((interest: string) => (
+                  <span
+                    key={interest}
+                    className="px-4 py-2 rounded-full text-[13px] font-medium text-zinc-300 bg-white/5 border border-white/8"
+                  >
+                    {interest}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+        </div>
       </div>
 
-      {/* Footer padding for mobile */}
-      <div className="h-12" />
+      <div className="h-24" />
     </div>
   );
 }
