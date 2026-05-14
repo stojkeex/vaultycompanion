@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { FloatingAdminButton } from "@/components/admin/floating-admin-button";
 import { UserModeration } from "@/components/superadmin/UserModeration";
-import { BottomNav } from "@/components/bottom-nav";
 
 // Assets
 import swimsuitThumb from "../assets/character/swimsuit_blue_thumb.webp";
@@ -578,7 +577,6 @@ export default function Home() {
           </>
         )}
       </AnimatePresence>
-      <BottomNav />
     </div>
   );
 }

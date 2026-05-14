@@ -300,16 +300,8 @@ export function BottomNav() {
     };
   }, [isDragging, onMove, onEnd]);
 
-  const shouldHide =
-    location === "/login" || location === "/register" || location === "/" ||
-    location === "/ai" || location.startsWith("/companion/") ||
-    location.startsWith("/messages/") || location === "/tos" ||
-    location.startsWith("/demo-trading/") || location.startsWith("/chat/private/") ||
-    location.startsWith("/course/") || location.startsWith("/coin/") ||
-    location.startsWith("/wallet") || location.startsWith("/user/") ||
-    location === "/create-post" || location === "/create-listing";
-
-  if (shouldHide) return null;
+  // Only show on home page
+  if (location !== "/home") return null;
 
   return (
     <>
